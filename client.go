@@ -6,6 +6,8 @@ import (
     "fmt"
     "net"
 	"strings"
+	"time"
+//	"./codec"
 )
 
 var quitSemaphore chan bool
@@ -19,7 +21,7 @@ func main() {
     fmt.Println("connected!")
 
 
-	//go onMessageRecived(conn)
+	go onMessageRecived(conn)
 	/*
     c := time.Tick(10 * time.Second)
     for now := range c {
@@ -39,11 +41,13 @@ func onMessageRecived(conn *net.TCPConn) {
     reader := bufio.NewReader(conn)
     for {
         msg, err := reader.ReadString('\n')
+		//msg, err := codec.Decode(reader)
         fmt.Println(msg)
         if err != nil {
             quitSemaphore <- true
             break
         }
+		time.Sleep(time.Second)
         b := []byte(msg)
         conn.Write(b)
     }

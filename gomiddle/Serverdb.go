@@ -3,9 +3,10 @@ package gomiddle
 import (
     "fmt"
     "database/sql"
-    _ "github.com/go-sql-driver/mysql"
     "log"
 )
+
+
 
 func Test(db *sql.DB) {
     tx, err := db.Begin()
