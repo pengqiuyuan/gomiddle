@@ -6,10 +6,10 @@ import (
     "database/sql"
 	_ "github.com/go-sql-driver/mysql"
     "log"
-	"./gomiddle"
 	"sync"
+	fb "./gomiddle/fb"
+	gomiddle "./gomiddle"
 )
-
 
 func main() {
 	var wg sync.WaitGroup
@@ -28,9 +28,10 @@ func main() {
         log.Fatal(err)
     }
 
-	wg.Add(3)
-	go gomiddle.TcpCon(db);
-    go gomiddle.SavePlacard() 
+	wg.Add(2)
+	go fb.PlacardHandler() 
+	go gomiddle.TcpCon(db)
+   
 	wg.Wait()
 	fmt.Println("exit")
 }
