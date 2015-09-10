@@ -42,9 +42,7 @@ func TcpCon(db *sql.DB) {
 		if err != nil {
 			continue
 		}
-
 		fmt.Println("A client connected : " + tcpConn.RemoteAddr().String())
-
 		go TcpPipe(tcpConn, db)
 	}
 }

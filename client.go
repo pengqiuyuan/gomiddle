@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"net"
 	"strings"
-	"./codec" 
+
+	"./codec"
 )
 
 var quitSemaphore chan bool
@@ -25,17 +26,6 @@ func main() {
 }
 
 func sendMessage(conn *net.TCPConn) {
-	/*
-		for {
-			time.Sleep(3 * time.Second)
-			// var msg string
-			// fmt.Scanln(&msg)
-			s := strings.Split(conn.LocalAddr().String(), ":")
-	        jsonStr := conn.LocalAddr().String()+`|serverStatus|request|{"serverZoneId":1,"platForm":["1","2"],"serverId":"fb_server_1","storeId":1,"ip":"`+s[0]+`","port":"`+s[1]+`","status":"1"}`
-	        b, _ := codec.Encode(jsonStr)
-	        conn.Write(b)
-		}
-	*/
 	s := strings.Split(conn.LocalAddr().String(), ":")
 	jsonStr := conn.LocalAddr().String() + `|serverStatus|{"serverZoneId":1,"platForm":["1","2"],"serverId":"fb_server_1","storeId":1,"ip":"` + s[0] + `","port":"` + s[1] + `","status":"1"}`
 	b, _ := codec.Encode(jsonStr)
@@ -45,14 +35,26 @@ func sendMessage(conn *net.TCPConn) {
 func onMessageRecived(conn *net.TCPConn) {
 	reader := bufio.NewReader(conn)
 	for {
-		msg, err := codec.Decode(reader)
-		fmt.Println(msg)
+		message, err := codec.Decode(reader)
+		fmt.Println(message)
 		if err != nil {
 			quitSemaphore <- true
 			break
 		}
-		s, _ := codec.Encode(conn.LocalAddr().String() + `|addPlacards|{"choose":1,"success":1,"objFail":[],"fail":0}|post`)
-		conn.Write(s)
+		s := strings.Split(message, "|")
+		if s[1] == "addPlacards" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"choose":1,"success":1,"objFail":[],"fail":0}|`+s[3]+``)
+			conn.Write(str)
+		} else if s[1] == "getTotalByServerZoneIdAndGameId" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"num":1}|`+s[3]+``)
+			conn.Write(str)
+		} else if s[1] == "getAllPlacards" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|"[{"id":1,"serverZoneId":"1","gameId":"1","serverId":"fb_server_1","version":"1","contents":"1"}]"|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "delPlacardById" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|"{"message":"success"}"|`+s[3]+``)
+			conn.Write(str)
+		}
+
 	}
 }
-

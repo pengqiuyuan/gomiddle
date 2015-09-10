@@ -45,13 +45,20 @@ func sendMessage(conn *net.TCPConn) {
 func onMessageRecived(conn *net.TCPConn) {
 	reader := bufio.NewReader(conn)
 	for {
-		msg, err := codec.Decode(reader)
-		fmt.Println(msg)
+		message, err := codec.Decode(reader)
+		fmt.Println(message)
 		if err != nil {
 			quitSemaphore <- true
 			break
 		}
-		s, _ := codec.Encode(conn.LocalAddr().String() + `|addPlacards|{"choose":1,"success":0,"objFail":["我是返回来的保存失败的消息"],"fail":1}|post`)
-		conn.Write(s)
+		s := strings.Split(message, "|")
+		if s[1] == "addPlacards" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"choose":1,"success":0,"objFail":[fb_server_3],"fail":1}|`+s[3]+``)
+			conn.Write(str)
+		} else if s[1] == "getTotalByServerZoneIdAndGameId" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"num":1}|`+s[3]+``)
+			conn.Write(str)
+		}
+
 	}
 }
