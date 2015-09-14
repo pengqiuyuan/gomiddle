@@ -16,13 +16,13 @@ var ConnM   map[string]string  = make(map[string]string)
 // 用来记录所有接收到游戏服务器发来的消息
 var ResponseMap map[string]string = make(map[string]string)
 // chan用来返回ResponseMap给httphandle
-var Channel_c = make(chan map[string]string)
+var Channel_c = make(chan map[string]string,1)
 
 type ServerInfoJson struct {
 	ServerZoneId int      `json:"serverZoneId"`
 	PlatForm     []string `json:"platForm"`
 	ServerId     string   `json:"serverId"`
-	StoreId      int      `json:"storeId"`
+	GameId      int      `json:"gameId"`
 	Ip           string   `json:"ip"`
 	Port         string   `json:"port"`
 	Status       string   `json:"status"`
@@ -68,7 +68,6 @@ func TcpPipe(conn *net.TCPConn, db *sql.DB) {
 		conn.Close()
 	}()
 	reader := bufio.NewReader(conn)
-
 	for {
 		message, err := codec.Decode(reader)
 		if err != nil {
@@ -83,20 +82,18 @@ func TcpPipe(conn *net.TCPConn, db *sql.DB) {
 				// 新连接加入map
 				ConnMap[jsonServer.ServerId] = conn
 				ConnM[ipStr] = jsonServer.ServerId
-				fmt.Printf("-->运营大区:%s 渠道:%s 服务器:%s 游戏:%s ip:%s 端口:%s 状态:%s\n", jsonServer.ServerZoneId, jsonServer.PlatForm, jsonServer.ServerId, int(jsonServer.StoreId), jsonServer.Ip, jsonServer.Port, jsonServer.Status)
+				fmt.Printf("-->运营大区:%s 渠道:%s 服务器:%s 游戏:%s ip:%s 端口:%s 状态:%s\n", jsonServer.ServerZoneId, jsonServer.PlatForm, jsonServer.ServerId, int(jsonServer.GameId), jsonServer.Ip, jsonServer.Port, jsonServer.Status)
 				Insert_serverZone(db, int(jsonServer.ServerZoneId))
-				Insert_storeId(db, int(jsonServer.StoreId))
+				Insert_gameId(db, int(jsonServer.GameId))
 				for i := 0; i < len(jsonServer.PlatForm); i++ {
-					Insert_all_platform(db, int(jsonServer.ServerZoneId), int(jsonServer.StoreId), jsonServer.PlatForm[i], jsonServer.ServerId)
+					Insert_all_platform(db, int(jsonServer.ServerZoneId), int(jsonServer.GameId), jsonServer.PlatForm[i], jsonServer.ServerId)
 				}
-				Select_all_server(db, int(jsonServer.ServerZoneId), int(jsonServer.StoreId), jsonServer.ServerId, jsonServer.Ip, jsonServer.Port, jsonServer.Status)
+				Select_all_server(db, int(jsonServer.ServerZoneId), int(jsonServer.GameId), jsonServer.ServerId, jsonServer.Ip, jsonServer.Port, jsonServer.Status)
 			}
 		} else {
-
 			//   127.0.0.1:53846_addPlacards   {"choose":1,"success":1,"objFail":["我是返回来的消息"],"fail":1}
 			ResponseMap[s[0]+"_"+s[1]] = s[2]
 			Channel_c <- ResponseMap
 		}
-
 	}
 }

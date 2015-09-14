@@ -49,7 +49,7 @@ func Insert_serverZone(db *sql.DB,serverZoneId int) {
 
 }
 
-func Insert_storeId(db *sql.DB,storeId int) {
+func Insert_gameId(db *sql.DB,gameId int) {
     tx, err := db.Begin()
     if err != nil {
         log.Fatal(err)
@@ -63,7 +63,7 @@ func Insert_storeId(db *sql.DB,storeId int) {
         return
     }
 
-    _,err = stmt.Exec(storeId)
+    _,err = stmt.Exec(gameId)
     err = tx.Commit()
 }
 
@@ -86,7 +86,7 @@ func Delete_server(db *sql.DB,ip string,port string) {
 }
 
 
-func Select_all_server(db *sql.DB,serverZoneId int,storeId int,serverId string,ip string, port string,status string){
+func Select_all_server(db *sql.DB,serverZoneId int,gameId int,serverId string,ip string, port string,status string){
     stmt,err :=  db.Prepare("SELECT server_id FROM game_go_all_server WHERE server_id = ?")
     defer stmt.Close()
     if err != nil{
@@ -109,7 +109,7 @@ func Select_all_server(db *sql.DB,serverZoneId int,storeId int,serverId string,i
             log.Println(err)
             return
         }
-        stmt.Exec(serverZoneId,storeId,serverId,ip,port,status)
+        stmt.Exec(serverZoneId,gameId,serverId,ip,port,status)
         err = tx.Commit()
     }else{
         tx, err := db.Begin()
@@ -125,7 +125,7 @@ func Select_all_server(db *sql.DB,serverZoneId int,storeId int,serverId string,i
             return
         }
 
-        res, err := stmt.Exec(serverZoneId,storeId,ip,port,status,serverId)
+        res, err := stmt.Exec(serverZoneId,gameId,ip,port,status,serverId)
         if err != nil{
             log.Println(res)
             return
@@ -136,7 +136,7 @@ func Select_all_server(db *sql.DB,serverZoneId int,storeId int,serverId string,i
 
 }
 
-func Insert_all_platform(db *sql.DB,serverZoneId int,storeId int,platFormId string,serverId string) {
+func Insert_all_platform(db *sql.DB,serverZoneId int,gameId int,platFormId string,serverId string) {
     tx, err := db.Begin()
     if err != nil {
         log.Fatal(err)
@@ -149,6 +149,6 @@ func Insert_all_platform(db *sql.DB,serverZoneId int,storeId int,platFormId stri
         log.Println(err)
         return
     }
-    stmt.Exec(serverZoneId,storeId,platFormId,serverId)
+    stmt.Exec(serverZoneId,gameId,platFormId,serverId)
     err = tx.Commit()
 }
