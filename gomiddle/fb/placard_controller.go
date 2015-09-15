@@ -126,11 +126,11 @@ func GetTotalByServerZoneIdAndGameId(w http.ResponseWriter, r *http.Request) {
  * 返回数据格式 127.0.0.1:54813|addPlacards|{"choose":1,"success":1,"objFail":[],"fail":0}|post
  */
 func SavePlacardHandler(w http.ResponseWriter, r *http.Request) {
-	AddOrUpdate("addPlacards", w, r)
+	AddOrUpdatePlacard("addPlacards", w, r)
 }
 
 func UpdatePlacards(w http.ResponseWriter, r *http.Request) {
-	AddOrUpdate("updatePlacards", w, r)
+	AddOrUpdatePlacard("updatePlacards", w, r)
 }
 
 /**
@@ -177,7 +177,7 @@ func DelPlacardById(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func AddOrUpdate(m string, w http.ResponseWriter, r *http.Request) {
+func AddOrUpdatePlacard(m string, w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		r.ParseForm()
 		result, _ := ioutil.ReadAll(r.Body)
@@ -221,12 +221,6 @@ func AddOrUpdate(m string, w http.ResponseWriter, r *http.Request) {
 					fmt.Println(key, "  存在,超时客户端无返回值  AddOrUpdate")
 					fail = fail + 1
 					objFail = append(objFail, key)
-					/*
-						default:
-							fmt.Println(key, "  存在,客户端无返回值  ")
-							fail = fail + 1
-							objFail = append(objFail, key)
-					*/
 				}
 			} else {
 				fmt.Println(key, "  不存在  ")

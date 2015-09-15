@@ -22,7 +22,7 @@ type ServerInfoJson struct {
 	ServerZoneId int      `json:"serverZoneId"`
 	PlatForm     []string `json:"platForm"`
 	ServerId     string   `json:"serverId"`
-	GameId      int      `json:"gameId"`
+	GameId       int      `json:"gameId"`
 	Ip           string   `json:"ip"`
 	Port         string   `json:"port"`
 	Status       string   `json:"status"`

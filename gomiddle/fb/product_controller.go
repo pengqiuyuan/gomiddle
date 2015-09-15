@@ -1,7 +1,14 @@
 package gomiddle
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
+	"time"
+	"../../codec"
+	"../../gomiddle"
+	"strings"
 )
 
 type ProductEntity struct{
@@ -28,24 +35,68 @@ type ProductEntity struct{
 }
 
 func ProductHandler() {
-	http.HandleFunc("/fbserver/seal/getAllProducts", GetAllProducts)
-	http.HandleFunc("/fbserver/seal/addProduct", AddProduct)
-	http.HandleFunc("/fbserver/seal/updateProduct", UpdateProduct)
-	http.HandleFunc("/fbserver/seal/delProductById", DelProductById)
-	http.HandleFunc("/fbserver/seal/getProduct", GetProduct)
+	http.HandleFunc("/fbserver/product/getAllProducts", GetAllProducts)
+	http.HandleFunc("/fbserver/product/addProduct", AddProduct)
+	http.HandleFunc("/fbserver/product/updateProduct", UpdateProduct)
+	http.HandleFunc("/fbserver/product/delProductById", DelProductById)
+	http.HandleFunc("/fbserver/product/getProduct", GetProduct)
 }
 
 
 func GetAllProducts(w http.ResponseWriter, r *http.Request){
-	
+	if r.Method == "GET" {
+		serverZoneId := r.FormValue("serverZoneId")
+		gameId := r.FormValue("gameId")
+		serverId := r.FormValue("serverId")
+		pageNumber := r.FormValue("pageNumber")
+		pageSize := r.FormValue("pageSize")
+		itemId := r.FormValue("itemId")
+		JsonStr := `{
+					"serverZoneId":"` + serverZoneId + `"
+					,"gameId":"` + gameId + `"
+					,"serverId":"` + serverId + `"
+					,"pageNumber":"` + pageNumber + `"
+					,"pageSize":"` + pageSize + `"
+					,"itemId":"` + itemId + `"
+					}`
+		conn, exists := gomiddle.ConnMap[serverId]
+		var res string
+		if exists {
+			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
+			b, err := codec.Encode(conn.RemoteAddr().String() + "|getAllProducts|" + string(JsonStr) + "|get")
+			if err != nil {
+				fmt.Println(err)
+			}
+			conn.Write(b)
+			//x := <-gomiddle.Channel_c
+			//res := x[conn.RemoteAddr().String()+"_getAllPlacards"]
+
+			select {
+			case x := <-gomiddle.Channel_c:
+				fmt.Println(serverId, "  存在,客户端有返回值  getAllProducts")
+				res = x[conn.RemoteAddr().String()+"_getAllProducts"]
+				bw := []byte(res)
+				w.Write(bw)
+			case <-time.After(time.Second * 1):
+				fmt.Println(serverId, "  存在,超时客户端无返回值  getAllProducts")
+				res = `[]`
+				bw := []byte(res)
+				w.Write(bw)
+			}
+		} else {
+			res = `[]`
+			bw := []byte(res)
+			w.Write(bw)
+		}
+	}
 }
 
 func AddProduct(w http.ResponseWriter, r *http.Request){
-	
+	AddOrUpdateProduct("addProduct", w, r)
 }
 
 func UpdateProduct(w http.ResponseWriter, r *http.Request){
-	
+	AddOrUpdateProduct("updateProduct", w, r)
 }
 
 func DelProductById(w http.ResponseWriter, r *http.Request){
@@ -54,4 +105,47 @@ func DelProductById(w http.ResponseWriter, r *http.Request){
 
 func GetProduct(w http.ResponseWriter, r *http.Request){
 	
+}
+
+
+func AddOrUpdateProduct(m string, w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		r.ParseForm()
+		result, _ := ioutil.ReadAll(r.Body)
+		r.Body.Close()
+		//结构已知，解析到结构体
+		var s ProductEntity
+		json.Unmarshal([]byte(result), &s)
+		ser := strings.Split(s.ServerId,",") 
+		fmt.Println(ser)
+				
+		for _, key := range ser {
+			//判断serverid是否在ConnMap里
+			conn, exists := gomiddle.ConnMap[key]
+			var res string
+			if exists {
+				fmt.Println(key, "  存在   ", conn)
+				b,_ := codec.Encode(conn.RemoteAddr().String() + "|" + m + "|" + string(result) + "|post")
+				conn.Write(b)
+				select {
+				case x := <-gomiddle.Channel_c:
+					fmt.Println(key, "  存在,客户端有返回值  AddOrUpdate")
+					res = x[conn.RemoteAddr().String()+"_"+m]
+					bw := []byte(res)
+					w.Write(bw)
+				case <-time.After(time.Second * 1):
+					fmt.Println(key, "  存在,超时客户端无返回值  AddOrUpdate")
+					res = `{"message":"error"}`
+					bw := []byte(res)
+					w.Write(bw)
+				}
+			} else {
+				fmt.Println(key, "  不存在  ")
+				res = `{"message":"error"}`
+				bw := []byte(res)
+				w.Write(bw)
+			}
+		}
+
+	}
 }

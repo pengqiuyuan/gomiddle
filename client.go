@@ -58,6 +58,48 @@ func onMessageRecived(conn *net.TCPConn) {
 			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"choose":1,"success":1,"objFail":[],"fail":0}|`+s[3]+``)
 			conn.Write(str)
 		}
+		
+		if s[1] == "addSealAccount" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"success"}|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "updateSealAccount" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"success"}|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "getAllSealAccount" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|[{"id":1,"serverZoneId":"1","gameId":"1","serverId":"fb_server_1","guid":"111","name":"adc","account":"1","platForm":"1","sealTime":"1234","sealStart":"2014-12-11 16:55:15","sealEnd":"2014-12-11 16:55:15"}]|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "delSealAccount" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"success"}|`+s[3]+``)
+			conn.Write(str)
+		}
+		
+		if s[1] == "addGagAccount" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"success"}|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "updateGagAccount" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"success"}|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "getAllGagAccount" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|[{"id":1,"serverZoneId":"1","gameId":"1","serverId":"fb_server_1","guid":"111","name":"adc","account":"1","platForm":"1","gagTime":"1234","gagStart":"2014-12-11 16:55:15","gagEnd":"2014-12-11 16:55:15"}]|`+s[3]+``)																
+			conn.Write(str)
+		}else if s[1] == "delGagAccountById" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"success"}|`+s[3]+``)
+			conn.Write(str)
+		}
+		
+		if s[1] == "addProduct" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"success"}|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "updateProduct" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"success"}|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "getAllProducts" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|[{"id":1,"serverZoneId":"1","gameId":"1","serverId":"fb_server_1","itemId":"1","num":"1","prodcutStoreId":"1","storeLocation":"1","isRandom":"1","randomProbability":"1","comsumeType":"1","comsumeNum":"1","discount":"1","levelLimit":"1","levelCap":"1","discountStartDate":"2014-12-11 16:55:15","discountContinueDate":"2014-12-11 16:55:15","discountCycleDate":"2014-12-11 16:55:15","productPostDate":"2014-12-11 16:55:15","productDownDate":"2014-12-11 16:55:15","showLevel":"1"}]|`+s[3]+``)																
+			conn.Write(str)
+		}else if s[1] == "delProductById" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"success"}|`+s[3]+``)
+			conn.Write(str)
+		}
 
 	}
 }

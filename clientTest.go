@@ -68,6 +68,49 @@ func onMessageRecived(conn *net.TCPConn) {
 			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"choose":1,"success":0,"objFail":["fb_server_3"],"fail":1}|`+s[3]+``)
 			conn.Write(str)
 		}
+		
+		if s[1] == "addSealAccount" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"error"}|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "updateSealAccount" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"error"}|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "getAllSealAccount" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|[]|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "delSealAccount" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"error"}|`+s[3]+``)
+			conn.Write(str)
+		}
+		
+		if s[1] == "addGagAccount" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"error"}|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "updateGagAccount" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"error"}|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "getAllGagAccount" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|[]|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "delGagAccountById" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"error"}|`+s[3]+``)
+			conn.Write(str)
+		}
+		
+				
+		if s[1] == "addProduct" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"success"}|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "updateProduct" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"success"}|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "getAllProducts" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|[]|`+s[3]+``)																
+			conn.Write(str)
+		}else if s[1] == "delProductById" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"success"}|`+s[3]+``)
+			conn.Write(str)
+		}
 
 	}
 }
