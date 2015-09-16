@@ -100,6 +100,23 @@ func onMessageRecived(conn *net.TCPConn) {
 			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"success"}|`+s[3]+``)
 			conn.Write(str)
 		}
+		
+		if s[1] == "addEmail" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"choose":1,"success":1,"objFail":[],"fail":0}|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "updateEmail" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"choose":1,"success":1,"objFail":[],"fail":0}|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "getAllEmails" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|[{"id":1,"serverZoneId":"1","gameId":"1","serverId":"fb_server_1","sender":"1","title":"1","contents":"1","annex":[{"itemId":"1","itemNum":1},{"itemId":"1","itemNum":1},{"itemId":"112","itemNum":1123}] }]|`+s[3]+``)																
+			conn.Write(str)
+		}else if s[1] == "delEmailById" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"success"}|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "getEmailById" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"id":1,"serverZoneId":"1","gameId":"1","serverId":"fb_server_1","sender":"1","title":"1","contents":"1","annex":[{"itemId":"1","itemNum":1},{"itemId":"1","itemNum":1},{"itemId":"112","itemNum":11234444}] }|`+s[3]+``)
+			conn.Write(str)
+		}
 
 	}
 }

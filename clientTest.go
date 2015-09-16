@@ -111,6 +111,23 @@ func onMessageRecived(conn *net.TCPConn) {
 			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"success"}|`+s[3]+``)
 			conn.Write(str)
 		}
+		
+		if s[1] == "addEmail" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"choose":1,"success":0,"objFail":["fb_server_3"],"fail":1}|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "updateEmail" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"choose":1,"success":0,"objFail":["fb_server_3"],"fail":1}|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "getAllEmails" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|[]|`+s[3]+``)																
+			conn.Write(str)
+		}else if s[1] == "delEmailById" {
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`|{"message":"error"}|`+s[3]+``)
+			conn.Write(str)
+		}else if s[1] == "getEmailById" {  //没有查询到返回空
+			str, _ := codec.Encode(conn.LocalAddr().String() + `|`+s[1]+`||`+s[3]+``)
+			conn.Write(str)
+		}
 
 	}
 }

@@ -56,12 +56,12 @@ func GetAllPlacards(w http.ResponseWriter, r *http.Request) {
 			
 			select {
 			case x := <-gomiddle.Channel_c:
-				fmt.Println(serverId, "  存在,客户端有返回值  GetAllPlacards")
+				fmt.Println(serverId, "  存在,客户端有返回值  getAllPlacards")
 				res = x[conn.RemoteAddr().String()+"_getAllPlacards"]
 				bw := []byte(res)
 				w.Write(bw)
 			case <-time.After(time.Second * 1):
-				fmt.Println(serverId, "  存在,超时客户端无返回值  GetAllPlacards")
+				fmt.Println(serverId, "  存在,超时客户端无返回值  getAllPlacards")
 				res = `[]`
 				bw := []byte(res)
 				w.Write(bw)
@@ -159,12 +159,12 @@ func DelPlacardById(w http.ResponseWriter, r *http.Request) {
 
 			select {
 			case x := <-gomiddle.Channel_c:
-				fmt.Println(serverId, "  存在,客户端有返回值  DelPlacardById")
+				fmt.Println(serverId, "  存在,客户端有返回值  delPlacardById")
 				res = x[conn.RemoteAddr().String()+"_delPlacardById"]
 				bw := []byte(res)
 				w.Write(bw)
 			case <-time.After(time.Second * 1):
-				fmt.Println(serverId, "  存在,超时客户端无返回值  DelPlacardById")
+				fmt.Println(serverId, "  存在,超时客户端无返回值  delPlacardById")
 				res = `{"message":"error"}`
 				bw := []byte(res)
 				w.Write(bw)

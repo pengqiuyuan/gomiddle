@@ -100,7 +100,40 @@ func UpdateProduct(w http.ResponseWriter, r *http.Request){
 }
 
 func DelProductById(w http.ResponseWriter, r *http.Request){
-	
+	if r.Method == "GET" {
+		serverZoneId := r.FormValue("serverZoneId")
+		gameId := r.FormValue("gameId")
+		serverId := r.FormValue("serverId")
+		id := r.FormValue("id")
+		JsonStr := `{"serverZoneId":"` + serverZoneId + `","gameId":"` + gameId + `","serverId":"` + serverId + `","id":"` + id + `"}`
+		conn, exists := gomiddle.ConnMap[serverId]
+		var res string
+		if exists {
+			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
+			b, err := codec.Encode(conn.RemoteAddr().String() + "|delProductById|" + string(JsonStr) + "|delete")
+			if err != nil {
+				fmt.Println(err)
+			}
+			conn.Write(b)
+
+			select {
+			case x := <-gomiddle.Channel_c:
+				fmt.Println(serverId, "  存在,客户端有返回值  delProductById")
+				res = x[conn.RemoteAddr().String()+"_delProductById"]
+				bw := []byte(res)
+				w.Write(bw)
+			case <-time.After(time.Second * 3):
+				fmt.Println(serverId, "  存在,超时客户端无返回值  delProductById")
+				res = `{"message":"error"}`
+				bw := []byte(res)
+				w.Write(bw)
+			}
+		} else {
+			res = `{"message":"error"}`
+			bw := []byte(res)
+			w.Write(bw)
+		}
+	}
 }
 
 func GetProduct(w http.ResponseWriter, r *http.Request){
