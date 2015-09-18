@@ -1,0 +1,7 @@
+namespace tutorial.tcp;
+
+table Gtom{
+      content      :string;          //消息体json字符串, 游戏服务器gameserver to gomiddle消息中间件
+}
+
+root_type Gtom;

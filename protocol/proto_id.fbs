@@ -1,0 +1,9 @@
+namespace tutorial.tcp;
+
+enum TcpProtoID : ushort {
+   Status,
+   Notice,
+   Max
+}
+
+
