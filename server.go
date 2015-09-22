@@ -1,41 +1,49 @@
-
 package main
 
 import (
-    "database/sql"
-	_ "github.com/go-sql-driver/mysql"
-    "log"
-	"sync"
-	"net/http"
-	fb "./gomiddle/fb"
+	"database/sql"
 	"encoding/json"
-	
+	"fmt"
+	"log"
+	"net/http"
+	"strings"
+	"sync"
+
+	hql "./gomiddle"
+	fb "./gomiddle/fb"
+	_ "github.com/go-sql-driver/mysql"
+
 	"enlightgame/net/tcp"
 	"enlightgame/transport"
-	proto "./tutorial/tcp"
-	flatbuffers "github.com/google/flatbuffers/go"
 	"os"
 	"os/signal"
 	"strconv"
+
+	proto "./tutorial/tcp"
+	flatbuffers "github.com/google/flatbuffers/go"
 )
+
+
 
 type ServerInfoJson struct {
 	ServerZoneId int      `json:"serverZoneId"`
 	PlatForm     []string `json:"platForm"`
 	ServerId     string   `json:"serverId"`
 	GameId       int      `json:"gameId"`
-	Ip           string   `json:"ip"`
-	Port         string   `json:"port"`
 	Status       string   `json:"status"`
 }
 
-type messageHandler func(uint32, *transport.TcpMessage)
 
 var (
 	wg         sync.WaitGroup
 	a          *tcp.Acceptor
 	cnt        int                       = 0
-	dispatcher map[uint16]messageHandler = make(map[uint16]messageHandler)
+	db *sql.DB
+	ConnMap map[string]*tcp.Acceptor = make(map[string]*tcp.Acceptor)  // 用来记录所有的客户端连接 ConnMap (key:fb_server_1 value:a) ConnM(key:fb_server_1 value:1) ConnM(key:1 value:fb_server_1)
+	ConnMa map[string]uint32 = make(map[string]uint32)
+	ConnM map[uint32]string = make(map[uint32]string)
+	ResponseMap map[string]string = make(map[string]string)  // 用来记录所有接收到游戏服务器发来的消息
+	Channel_c = make(chan map[string]string, 1) // chan用来返回ResponseMap给httphandle
 )
 
 func shutdown() {
@@ -68,47 +76,65 @@ func makeNoticeMsg() []byte {
 	return ret
 }
 
-func statusHandler(id uint32, t *transport.TcpMessage) {
-	// 从消息payload部分获取正文内容
-	s := proto.GetRootAsGtom(t.Payload, 0)
-	//log.Printf("recv status! %v, %v, %v, %v, %v, %v, %v, %v", s.ServerZoneId(), s.PlatForm(0), s.PlatForm(1), s.ServerId(), s.GameId(), s.Ip(), s.Port(), s.Status())
-	//log.Printf("recv status! %v, %v, %v, %v, %v, %v, %v, %v", string(s.ServerZoneId()), string(s.PlatForm(0)), string(s.PlatForm(1)), string(s.ServerId()), string(s.GameId()), string(s.Ip()), int(s.Port()), int(s.Status()) )
-	
-
-	log.Printf("222222222crecv status! %v",	a.RemoteAddr(id))
-	var jsonServer ServerInfoJson
-	if err := json.Unmarshal(s.Content(), &jsonServer); err == nil {
-		log.Printf("-->运营大区:%s 渠道:%s 服务器:%s 游戏:%s ip:%s 端口:%s 状态:%s\n", jsonServer.ServerZoneId, jsonServer.PlatForm, jsonServer.ServerId, int(jsonServer.GameId), jsonServer.Ip, jsonServer.Port, jsonServer.Status)
-	}
-	
-	// 发送notice消息
-	//msg := makeNoticeMsg()
-	//a.Send(id, msg)
-}
-
 func handleConnect(id uint32) {
 	log.Println("accept: ", id)
 }
 
 func handleMessage(id uint32, b []byte) {
 	log.Println("on message: ", b)
-	rt := transport.TcpMessage{}
+	t := transport.TcpMessage{}
 
 	// 从缓冲区获取消息内容
-	err := rt.Unpack(b)
+	err := t.Unpack(b)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	// 根据协议ID分发消息到指定的处理器
-	handler, ok := dispatcher[rt.Header.Proto]
-	if ok && handler != nil {
-		handler(id, &rt)
+	m := t.Header
+	//唯一游戏服务器发送的消息，服务器状态路由 TcpProtoIDStatus
+	if m.Proto == proto.TcpProtoIDStatus {
+		// 从消息payload部分获取正文内容
+		s := proto.GetRootAsGtom(t.Payload, 0)
+		var jsonServer ServerInfoJson
+		if err := json.Unmarshal(s.Content(), &jsonServer); err == nil {
+			// 新连接加入map
+			ConnMap[jsonServer.ServerId] = a
+			ConnMa[jsonServer.ServerId] = id
+			ConnM[id] = jsonServer.ServerId
+			sip := strings.Split(a.RemoteAddr(id), ":")
+			fmt.Printf("-->运营大区:%s 渠道:%s 服务器:%s 游戏:%s ip:%s 端口:%s 状态:%s\n", jsonServer.ServerZoneId, jsonServer.PlatForm, jsonServer.ServerId, int(jsonServer.GameId), sip[0], sip[1], jsonServer.Status)
+			hql.Insert_serverZone(db, int(jsonServer.ServerZoneId))
+			hql.Insert_gameId(db, int(jsonServer.GameId))
+			for i := 0; i < len(jsonServer.PlatForm); i++ {
+				hql.Insert_all_platform(db, int(jsonServer.ServerZoneId), int(jsonServer.GameId), jsonServer.PlatForm[i], jsonServer.ServerId)
+			}
+			hql.Select_all_server(db, int(jsonServer.ServerZoneId), int(jsonServer.GameId), jsonServer.ServerId, sip[0], sip[1], jsonServer.Status)
+		}
+	} else {
+		// 从消息payload部分获取正文内容
+		s := proto.GetRootAsGtom(t.Payload, 0)
+		//   1_2   {"choose":1,"success":1,"objFail":["我是返回来的消息"],"fail":1}
+		ResponseMap[string(id)+"_"+string(m.Proto)] = string(s.Content())
+		Channel_c <- ResponseMap
 	}
+	
 }
 
 func handleDisconnect(id uint32) {
 	log.Println("disconnect id: ", id)
+	delete(ConnMap, ConnM[id])
+	delete(ConnMa, ConnM[id])
+	delete(ConnM, id)
+	//移除断开客户端保存再ResponseMap里的消息
+	for key, _ := range ResponseMap {
+		ke := strings.Split(key, "_")
+		if ke[0] == string(id) {
+			delete(ResponseMap, key)
+		}
+	}
+	sip := strings.Split(a.RemoteAddr(id), ":")
+	//mysql删除对应保存的客户端信息
+	hql.Delete_server(db, sip[0], sip[1])
 }
 
 func init() {
@@ -118,30 +144,19 @@ func init() {
 	p.BodySizeOffset = 21
 	p.BodySizeLen = 2
 	p.NotifyWithHead = true
-	a = tcp.NewAcceptor(":8898", p)
-
-	// 注册消息处理器
-	dispatcher[proto.TcpProtoIDStatus] = statusHandler
+	a = tcp.NewAcceptor(":8898", p)	
 }
 
-
 func main() {
-	var wg sync.WaitGroup
-	db, err := sql.Open("mysql", "root:123456@tcp(10.0.29.251:3306)/game_server?charset=utf8")
-    if err != nil {
-        log.Println("mysql init failed")
-        return
-    }else{
-        log.Println("mysql init ok")
-    }
-    defer db.Close()
-    err = db.Ping()
-    if err != nil {
-        log.Fatal(err)
-    }
+	var err error
+	db, err = sql.Open("mysql", "root:123456@tcp(10.0.29.251:3306)/game_server?charset=utf8")
+	defer db.Close()
+	err = db.Ping()
+	if err != nil {
+		log.Fatal(err)
+	}
 	
 	log.SetFlags(log.Flags() | log.Lshortfile)
-
 	a.HandleConnect(handleConnect)
 	a.HandleMessage(handleMessage)
 	a.HandleDisconnect(handleDisconnect)
@@ -149,14 +164,14 @@ func main() {
 	ch := make(chan os.Signal)
 	signal.Notify(ch, os.Interrupt, os.Kill)
 	go a.Start()
-	go Handle() 
+	go Handle()
 	<-ch
 	a.Stop(shutdown)
 	wg.Wait()
 
 }
 
-func Handle(){
+func Handle() {
 	FbHandle()
 	KdsHandle()
 	KunHandle()
@@ -166,7 +181,7 @@ func Handle(){
 	}
 }
 
-func FbHandle(){
+func FbHandle() {
 	fb.PlacardHandler()
 	fb.GagHandler()
 	fb.SealHandler()
@@ -174,13 +189,10 @@ func FbHandle(){
 	fb.ProductHandler()
 }
 
-func KdsHandle(){
-	
+func KdsHandle() {
+
 }
 
-func KunHandle(){
-	
+func KunHandle() {
+
 }
-
-
-

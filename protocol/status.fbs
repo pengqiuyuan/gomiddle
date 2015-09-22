@@ -5,8 +5,6 @@ table Status{
       platForm          :[string];        //渠道列表
       serverId          :string;          //服务器
       gameId            :string;          //游戏
-      ip                :string;          //IP地址
-      port              :ushort;          //端口
       status            :int;             //状态
 }
 

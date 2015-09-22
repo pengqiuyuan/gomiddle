@@ -42,7 +42,6 @@ func makeStatusMsg() []byte {
 
 	serverId := builder.CreateString("server id")
 	game := builder.CreateString("game")
-	ip := builder.CreateString("ip")
 
 	proto.StatusStart(builder)
 	proto.StatusAddServerZoneId(builder, zone)
@@ -51,8 +50,6 @@ func makeStatusMsg() []byte {
 
 	proto.StatusAddServerId(builder, serverId)
 	proto.StatusAddGameId(builder, game)
-	proto.StatusAddIp(builder, ip)
-	proto.StatusAddPort(builder, 12345)
 	proto.StatusAddStatus(builder, 0)
 
 	payload := proto.StatusEnd(builder)
@@ -77,8 +74,7 @@ func makeGtomMsg() []byte {
 	t := transport.TcpMessage{}
 
 	builder := flatbuffers.NewBuilder(0)
-	
-	str:= `{"serverZoneId":1,"platForm":["1","2"],"serverId":"fb_server_1","gameId":1,"ip":"10.0.0.11","port":"1111","status":"1"}`
+	str:= `{"serverZoneId":1,"platForm":["1","2"],"serverId":"fb_server_1","gameId":1,"status":"1"}`
 	
 	ct := builder.CreateString(str)
 	proto.NoticeStart(builder)
