@@ -1,7 +1,0 @@
-namespace tutorial.tcp;
-
-table Notice{
-      content      :string;          //公告内容
-}
-
-root_type Notice;

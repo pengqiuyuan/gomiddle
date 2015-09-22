@@ -1,13 +1,13 @@
 package gomiddle
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"time"
-	"io/ioutil"
-	"encoding/json"
+	"../../codec"
 	"../../gomiddle"
-	proto "../../tutorial/tcp"
 )
 
 type SealEntity struct {
@@ -40,17 +40,22 @@ func GetAllSealAccount(w http.ResponseWriter, r *http.Request) {
 		var res string
 		if exists {
 			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
-			connid, _ := gomiddle.ConnMa[serverId]
-			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDFbGetAllSealAccount))	
+			b, err := codec.Encode(conn.RemoteAddr().String() + "|getAllSealAccount|" + string(JsonStr) + "|get")
+			if err != nil {
+				fmt.Println(err)
+			}
+			conn.Write(b)
+			//x := <-gomiddle.Channel_c
+			//res := x[conn.RemoteAddr().String()+"_getAllPlacards"]
 
 			select {
 			case x := <-gomiddle.Channel_c:
-				fmt.Println(serverId, "  存在,客户端有返回值  getAllSealAccount ",proto.TcpProtoIDFbGetAllSealAccount)
-				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbGetAllSealAccount)]
+				fmt.Println(serverId, "  存在,客户端有返回值  getAllSealAccount")
+				res = x[conn.RemoteAddr().String()+"_getAllSealAccount"]
 				bw := []byte(res)
 				w.Write(bw)
 			case <-time.After(time.Second * 1):
-				fmt.Println(serverId, "  存在,超时客户端无返回值  getAllSealAccount ",proto.TcpProtoIDFbGetAllSealAccount)
+				fmt.Println(serverId, "  存在,超时客户端无返回值  getAllSealAccount")
 				res = `[]`
 				bw := []byte(res)
 				w.Write(bw)
@@ -64,11 +69,11 @@ func GetAllSealAccount(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddSealAccount(w http.ResponseWriter, r *http.Request) {
-	AddOrUpdateSeal(proto.TcpProtoIDFbAddSealAccount, w, r)
+	AddOrUpdateSeal("addSealAccount", w, r)
 }
 
 func UpdateSealAccount(w http.ResponseWriter, r *http.Request) {
-	AddOrUpdateSeal(proto.TcpProtoIDFbUpdateSealAccount, w, r)
+	AddOrUpdateSeal("updateSealAccount", w, r)
 }
 
 func DelSealAccount(w http.ResponseWriter, r *http.Request) {
@@ -82,17 +87,22 @@ func DelSealAccount(w http.ResponseWriter, r *http.Request) {
 		var res string
 		if exists {
 			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
-			connid, _ := gomiddle.ConnMa[serverId]
-			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDFbDelSealAccount))	
+			b, err := codec.Encode(conn.RemoteAddr().String() + "|delSealAccount|" + string(JsonStr) + "|delete")
+			if err != nil {
+				fmt.Println(err)
+			}
+			conn.Write(b)
+			//x := <-gomiddle.Channel_c
+			//res := x[conn.RemoteAddr().String()+"_delPlacardById"]
 
 			select {
 			case x := <-gomiddle.Channel_c:
-				fmt.Println(serverId, "  存在,客户端有返回值  delSealAccount ",proto.TcpProtoIDFbDelSealAccount)
-				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbDelSealAccount)]
+				fmt.Println(serverId, "  存在,客户端有返回值  delSealAccount")
+				res = x[conn.RemoteAddr().String()+"_delSealAccount"]
 				bw := []byte(res)
 				w.Write(bw)
 			case <-time.After(time.Second * 1):
-				fmt.Println(serverId, "  存在,超时客户端无返回值  delSealAccount ",proto.TcpProtoIDFbDelSealAccount)
+				fmt.Println(serverId, "  存在,超时客户端无返回值  delSealAccount")
 				res = `{"message":"error"}`
 				bw := []byte(res)
 				w.Write(bw)
@@ -105,7 +115,7 @@ func DelSealAccount(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func AddOrUpdateSeal(m uint16, w http.ResponseWriter, r *http.Request) {
+func AddOrUpdateSeal(m string, w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		r.ParseForm()
 		result, _ := ioutil.ReadAll(r.Body)
@@ -120,16 +130,16 @@ func AddOrUpdateSeal(m uint16, w http.ResponseWriter, r *http.Request) {
 		var res string
 		if exists {
 			fmt.Println(ser, "  存在   ", conn)
-			connid, _ := gomiddle.ConnMa[ser]
-			conn.Send(connid, makeNoticeMsg(string(result),m))
+			b,_ := codec.Encode(conn.RemoteAddr().String() + "|" + m + "|" + string(result) + "|post")
+			conn.Write(b)
 			select {
 			case x := <-gomiddle.Channel_c:
-				fmt.Println(ser, "  存在,客户端有返回值  AddOrUpdate ",m)
-				res = x[string(connid)+"_"+string(m)]
+				fmt.Println(ser, "  存在,客户端有返回值  AddOrUpdate")
+				res = x[conn.RemoteAddr().String()+"_"+m]
 				bw := []byte(res)
 				w.Write(bw)
 			case <-time.After(time.Second * 1):
-				fmt.Println(ser, "  存在,超时客户端无返回值  AddOrUpdate ",m)
+				fmt.Println(ser, "  存在,超时客户端无返回值  AddOrUpdate")
 				res = `{"message":"error"}`
 				bw := []byte(res)
 				w.Write(bw)

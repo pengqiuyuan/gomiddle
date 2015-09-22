@@ -1,17 +1,15 @@
 package gomiddle
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"time"
-	"log"
-	"io/ioutil"
-	"encoding/json"
-	"../../gomiddle"
-	"enlightgame/transport"
+
+	"../../codec"
 	entity "../../entity"
-	proto "../../tutorial/tcp"
-	flatbuffers "github.com/google/flatbuffers/go"
+	"../../gomiddle"
 )
 
 type PlacardEntity struct {
@@ -26,41 +24,15 @@ type PlacardEntity struct {
 func PlacardHandler() {
 	http.HandleFunc("/fbserver/placard/getAllPlacards", GetAllPlacards)
 	http.HandleFunc("/fbserver/getTotalByServerZoneIdAndGameId", GetTotalByServerZoneIdAndGameId)
-	http.HandleFunc("/fbserver/placard/addPlacards", SavePlacard)
+	http.HandleFunc("/fbserver/placard/addPlacards", SavePlacardHandler)
 	http.HandleFunc("/fbserver/placard/updatePlacards", UpdatePlacards)
 	http.HandleFunc("/fbserver/placard/delPlacardById", DelPlacardById)
-}
-
-func makeNoticeMsg(str string,p uint16) []byte {
-	t := transport.TcpMessage{}
-
-	builder := flatbuffers.NewBuilder(0)
-	
-	ct := builder.CreateString(str)
-	proto.NoticeStart(builder)
-	proto.NoticeAddContent(builder, ct)
-	payload := proto.NoticeEnd(builder)
-	
-	builder.Finish(payload)
-
-	t.Payload = builder.Bytes[builder.Head():]
-
-	// 填充协议头信息
-	t.Header.Proto = p
-	t.Header.Flag = 0xdcba
-	t.Header.Size = uint16(len(t.Payload))
-
-	ret, err := t.Pack()
-	if err != nil {
-		log.Fatal(err.Error())
-		return nil
-	}
-	return ret
 }
 
 /**
  * 查询运营大区、游戏下所有的公告
  * 参数 localhost:8899/fbserver/placard/getAllPlacards?serverZoneId=1&gameId=1&pageNumber=1&serverId=fb_server_1&pageSize=1
+ * 传入格式 127.0.0.1:53038|getAllPlacards|{"serverZoneId":"1","gameId":"1","serverId":"fb_server_1","pageNumber":"1","pageSize":"1"}|get
  */
 func GetAllPlacards(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
@@ -74,19 +46,22 @@ func GetAllPlacards(w http.ResponseWriter, r *http.Request) {
 		var res string
 		if exists {
 			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
-			connid, _ := gomiddle.ConnMa[serverId]
-
-			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDFbGetAllPlacards))	
+			b, err := codec.Encode(conn.RemoteAddr().String() + "|getAllPlacards|" + string(JsonStr) + "|get")
+			if err != nil {
+				fmt.Println(err)
+			}
+			conn.Write(b)
+			//x := <-gomiddle.Channel_c
+			//res := x[conn.RemoteAddr().String()+"_getAllPlacards"]
 			
-	
 			select {
 			case x := <-gomiddle.Channel_c:
-				fmt.Println(serverId, "  存在,客户端有返回值  getAllPlacards  " , proto.TcpProtoIDFbGetAllPlacards)
-				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbGetAllPlacards)]
+				fmt.Println(serverId, "  存在,客户端有返回值  GetAllPlacards")
+				res = x[conn.RemoteAddr().String()+"_getAllPlacards"]
 				bw := []byte(res)
 				w.Write(bw)
 			case <-time.After(time.Second * 1):
-				fmt.Println(serverId, "  存在,超时客户端无返回值  getAllPlacards  " , proto.TcpProtoIDFbGetAllPlacards)
+				fmt.Println(serverId, "  存在,超时客户端无返回值  GetAllPlacards")
 				res = `[]`
 				bw := []byte(res)
 				w.Write(bw)
@@ -102,6 +77,8 @@ func GetAllPlacards(w http.ResponseWriter, r *http.Request) {
 /**
  * 查询运营大区、游戏下 公告的总数
  * 参数 localhost:8899/fbserver/getTotalByServerZoneIdAndGameId?serverZoneId=1&gameId=1&category=placard&serverId=fb_server_1
+ * 传入格式 127.0.0.1:54726|getTotalByServerZoneIdAndGameId|{"serverZoneId":"1","gameId":"1","category":"placard","serverId":"fb_server_1"}|get
+ * 返回格式 map key 127.0.0.1:54726_getTotalByServerZoneIdAndGameId    value {"num":1}
  */
 func GetTotalByServerZoneIdAndGameId(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
@@ -115,18 +92,22 @@ func GetTotalByServerZoneIdAndGameId(w http.ResponseWriter, r *http.Request) {
 		var res string
 		if exists {
 			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
-			
-			connid, _ := gomiddle.ConnMa[serverId]
-			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDFbGetTotalByServerZoneIdAndGameId))	
+			b, err := codec.Encode(conn.RemoteAddr().String() + "|getTotalByServerZoneIdAndGameId|" + string(JsonStr) + "|get")
+			if err != nil {
+				fmt.Println(err)
+			}
+			conn.Write(b)
+			//x := <-gomiddle.Channel_c
+			//res := x[conn.RemoteAddr().String()+"_getTotalByServerZoneIdAndGameId"]
 
 			select {
 			case x := <-gomiddle.Channel_c:
-				fmt.Println(serverId, "  存在,客户端有返回值  GetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDFbGetTotalByServerZoneIdAndGameId)
-				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbGetTotalByServerZoneIdAndGameId)]
+				fmt.Println(serverId, "  存在,客户端有返回值  GetTotalByServerZoneIdAndGameId")
+				res = x[conn.RemoteAddr().String()+"_getTotalByServerZoneIdAndGameId"]
 				bw := []byte(res)
 			    w.Write(bw)
 			case <-time.After(time.Second * 1):
-				fmt.Println(serverId, "  存在,超时客户端无返回值  GetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDFbGetTotalByServerZoneIdAndGameId)
+				fmt.Println(serverId, "  存在,超时客户端无返回值  GetTotalByServerZoneIdAndGameId")
 				res = `{"num":0}`
 				bw := []byte(res)
 				w.Write(bw)
@@ -141,18 +122,21 @@ func GetTotalByServerZoneIdAndGameId(w http.ResponseWriter, r *http.Request) {
 
 /**
  * 保存公告
+ * 传入数据格式 127.0.0.1:54726|addPlacards|{"id":2,"serverZoneId":"1","contents":"<p>\r\n\t1<\/p>\r\n","gameId":"1","serverId":"fb_server_1,fb_server_2,fb_server_3","serverIds":null,"version":"1"}|post
+ * 返回数据格式 127.0.0.1:54813|addPlacards|{"choose":1,"success":1,"objFail":[],"fail":0}|post
  */
-func SavePlacard(w http.ResponseWriter, r *http.Request) {
-	AddOrUpdatePlacard(proto.TcpProtoIDFbSavePlacard, w, r)
+func SavePlacardHandler(w http.ResponseWriter, r *http.Request) {
+	AddOrUpdatePlacard("addPlacards", w, r)
 }
 
 func UpdatePlacards(w http.ResponseWriter, r *http.Request) {
-	AddOrUpdatePlacard(proto.TcpProtoIDFbUpdatePlacards, w, r)
+	AddOrUpdatePlacard("updatePlacards", w, r)
 }
 
 /**
  * 根据id删除公告
  * 参数 localhost:8899/fbserver/placard/delPlacardById?id=1&serverZoneId=1&gameId=1&serverId=fb_server_1
+ * 传入格式 127.0.0.1:53340|delPlacardById|{"serverZoneId":"1","gameId":"1","serverId":"fb_server_1","id":"1"}|delete
  */
 func DelPlacardById(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
@@ -165,17 +149,22 @@ func DelPlacardById(w http.ResponseWriter, r *http.Request) {
 		var res string
 		if exists {
 			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
-			connid, _ := gomiddle.ConnMa[serverId]
-			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDFbDelPlacardById))	
-			
+			b, err := codec.Encode(conn.RemoteAddr().String() + "|delPlacardById|" + string(JsonStr) + "|delete")
+			if err != nil {
+				fmt.Println(err)
+			}
+			conn.Write(b)
+			//x := <-gomiddle.Channel_c
+			//res := x[conn.RemoteAddr().String()+"_delPlacardById"]
+
 			select {
 			case x := <-gomiddle.Channel_c:
-				fmt.Println(serverId, "  存在,客户端有返回值  delPlacardById  ",proto.TcpProtoIDFbDelPlacardById)
-				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbDelPlacardById)]
+				fmt.Println(serverId, "  存在,客户端有返回值  DelPlacardById")
+				res = x[conn.RemoteAddr().String()+"_delPlacardById"]
 				bw := []byte(res)
 				w.Write(bw)
 			case <-time.After(time.Second * 1):
-				fmt.Println(serverId, "  存在,超时客户端无返回值  delPlacardById  ",proto.TcpProtoIDFbDelPlacardById)
+				fmt.Println(serverId, "  存在,超时客户端无返回值  DelPlacardById")
 				res = `{"message":"error"}`
 				bw := []byte(res)
 				w.Write(bw)
@@ -188,7 +177,7 @@ func DelPlacardById(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func AddOrUpdatePlacard(m uint16, w http.ResponseWriter, r *http.Request) {
+func AddOrUpdatePlacard(m string, w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		r.ParseForm()
 		result, _ := ioutil.ReadAll(r.Body)
@@ -211,14 +200,17 @@ func AddOrUpdatePlacard(m uint16, w http.ResponseWriter, r *http.Request) {
 			conn, exists := gomiddle.ConnMap[key]
 			if exists {
 				fmt.Println(key, "  存在   ", conn)
-				connid, _ := gomiddle.ConnMa[key]
-				conn.Send(connid, makeNoticeMsg(string(result),m))	
+				b, err := codec.Encode(conn.RemoteAddr().String() + "|" + m + "|" + string(result) + "|post")
+				if err != nil {
+					continue
+				}
+				conn.Write(b)
 
 				select {
 				case x := <-gomiddle.Channel_c:
-					fmt.Println(key, "  存在,客户端有返回值  AddOrUpdate  ",m)
+					fmt.Println(key, "  存在,客户端有返回值  AddOrUpdate")
 					var responseList entity.ResponseList
-					if err := json.Unmarshal([]byte(x[string(connid)+"_"+string(m)]), &responseList); err == nil {
+					if err := json.Unmarshal([]byte(x[conn.RemoteAddr().String()+"_"+m]), &responseList); err == nil {
 						success = success + responseList.Success
 						fail = fail + responseList.Fail
 						if len(responseList.ObjFail) != 0 {
@@ -226,7 +218,7 @@ func AddOrUpdatePlacard(m uint16, w http.ResponseWriter, r *http.Request) {
 						}
 					}
 				case <-time.After(time.Second * 1):
-					fmt.Println(key, "  存在,超时客户端无返回值  AddOrUpdate  ",m)
+					fmt.Println(key, "  存在,超时客户端无返回值  AddOrUpdate")
 					fail = fail + 1
 					objFail = append(objFail, key)
 				}
@@ -242,6 +234,3 @@ func AddOrUpdatePlacard(m uint16, w http.ResponseWriter, r *http.Request) {
 		w.Write(b)
 	}
 }
-
-
-
