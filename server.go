@@ -8,19 +8,16 @@ import (
 	"net/http"
 	"strings"
 	"sync"
-
-	hql "./gomiddle"
-	fb "./gomiddle/fb"
 	_ "github.com/go-sql-driver/mysql"
 
 	"enlightgame/net/tcp"
 	"enlightgame/transport"
 	"os"
 	"os/signal"
-	"strconv"
 
+	hql "./gomiddle"
+	fb "./gomiddle/fb"
 	proto "./tutorial/tcp"
-	flatbuffers "github.com/google/flatbuffers/go"
 )
 
 
@@ -39,41 +36,10 @@ var (
 	a          *tcp.Acceptor
 	cnt        int                       = 0
 	db *sql.DB
-	ConnMap map[string]*tcp.Acceptor = make(map[string]*tcp.Acceptor)  // 用来记录所有的客户端连接 ConnMap (key:fb_server_1 value:a) ConnM(key:fb_server_1 value:1) ConnM(key:1 value:fb_server_1)
-	ConnMa map[string]uint32 = make(map[string]uint32)
-	ConnM map[uint32]string = make(map[uint32]string)
-	ResponseMap map[string]string = make(map[string]string)  // 用来记录所有接收到游戏服务器发来的消息
-	Channel_c = make(chan map[string]string, 1) // chan用来返回ResponseMap给httphandle
 )
 
 func shutdown() {
 	wg.Done()
-}
-
-func makeNoticeMsg() []byte {
-	t := transport.TcpMessage{}
-
-	builder := flatbuffers.NewBuilder(0)
-	ct := builder.CreateString(strconv.Itoa(cnt))
-	proto.NoticeStart(builder)
-	cnt += 1
-	proto.NoticeAddContent(builder, ct)
-	payload := proto.NoticeEnd(builder)
-	builder.Finish(payload)
-
-	t.Payload = builder.Bytes[builder.Head():]
-
-	// 填充协议头信息
-	t.Header.Proto = proto.TcpProtoIDNotice
-	t.Header.Flag = 0xdcba
-	t.Header.Size = uint16(len(t.Payload))
-
-	ret, err := t.Pack()
-	if err != nil {
-		log.Fatal(err.Error())
-		return nil
-	}
-	return ret
 }
 
 func handleConnect(id uint32) {
@@ -92,15 +58,15 @@ func handleMessage(id uint32, b []byte) {
 
 	m := t.Header
 	//唯一游戏服务器发送的消息，服务器状态路由 TcpProtoIDStatus
-	if m.Proto == proto.TcpProtoIDStatus {
+	if m.Proto == proto.TcpProtoIDGmStatus {
 		// 从消息payload部分获取正文内容
-		s := proto.GetRootAsGtom(t.Payload, 0)
+		s := proto.GetRootAsNotice(t.Payload, 0)
 		var jsonServer ServerInfoJson
 		if err := json.Unmarshal(s.Content(), &jsonServer); err == nil {
 			// 新连接加入map
-			ConnMap[jsonServer.ServerId] = a
-			ConnMa[jsonServer.ServerId] = id
-			ConnM[id] = jsonServer.ServerId
+			hql.ConnMap[jsonServer.ServerId] = a
+			hql.ConnMa[jsonServer.ServerId] = id
+			hql.ConnM[id] = jsonServer.ServerId
 			sip := strings.Split(a.RemoteAddr(id), ":")
 			fmt.Printf("-->运营大区:%s 渠道:%s 服务器:%s 游戏:%s ip:%s 端口:%s 状态:%s\n", jsonServer.ServerZoneId, jsonServer.PlatForm, jsonServer.ServerId, int(jsonServer.GameId), sip[0], sip[1], jsonServer.Status)
 			hql.Insert_serverZone(db, int(jsonServer.ServerZoneId))
@@ -112,24 +78,24 @@ func handleMessage(id uint32, b []byte) {
 		}
 	} else {
 		// 从消息payload部分获取正文内容
-		s := proto.GetRootAsGtom(t.Payload, 0)
+		s := proto.GetRootAsNotice(t.Payload, 0)
 		//   1_2   {"choose":1,"success":1,"objFail":["我是返回来的消息"],"fail":1}
-		ResponseMap[string(id)+"_"+string(m.Proto)] = string(s.Content())
-		Channel_c <- ResponseMap
+		hql.ResponseMap[string(id)+"_"+string(m.Proto)] = string(s.Content())
+		hql.Channel_c <- hql.ResponseMap
 	}
 	
 }
 
 func handleDisconnect(id uint32) {
 	log.Println("disconnect id: ", id)
-	delete(ConnMap, ConnM[id])
-	delete(ConnMa, ConnM[id])
-	delete(ConnM, id)
+	delete(hql.ConnMap, hql.ConnM[id])
+	delete(hql.ConnMa, hql.ConnM[id])
+	delete(hql.ConnM, id)
 	//移除断开客户端保存再ResponseMap里的消息
-	for key, _ := range ResponseMap {
+	for key, _ := range hql.ResponseMap {
 		ke := strings.Split(key, "_")
 		if ke[0] == string(id) {
-			delete(ResponseMap, key)
+			delete(hql.ResponseMap, key)
 		}
 	}
 	sip := strings.Split(a.RemoteAddr(id), ":")

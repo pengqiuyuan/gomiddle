@@ -1,14 +1,14 @@
 package gomiddle
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"time"
-	"../../codec"
-	"../../gomiddle"
+	"io/ioutil"
+	"encoding/json"
 	"strings"
+	"../../gomiddle"
+	proto "../../tutorial/tcp"
 )
 
 type ProductEntity struct{
@@ -63,22 +63,17 @@ func GetAllProducts(w http.ResponseWriter, r *http.Request){
 		var res string
 		if exists {
 			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
-			b, err := codec.Encode(conn.RemoteAddr().String() + "|getAllProducts|" + string(JsonStr) + "|get")
-			if err != nil {
-				fmt.Println(err)
-			}
-			conn.Write(b)
-			//x := <-gomiddle.Channel_c
-			//res := x[conn.RemoteAddr().String()+"_getAllPlacards"]
+			connid, _ := gomiddle.ConnMa[serverId]
+			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDFbGetAllProducts))	
 
 			select {
 			case x := <-gomiddle.Channel_c:
-				fmt.Println(serverId, "  存在,客户端有返回值  getAllProducts")
-				res = x[conn.RemoteAddr().String()+"_getAllProducts"]
+				fmt.Println(serverId, "  存在,客户端有返回值  getAllProducts ",proto.TcpProtoIDFbGetAllProducts)
+				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbGetAllProducts)]
 				bw := []byte(res)
 				w.Write(bw)
 			case <-time.After(time.Second * 1):
-				fmt.Println(serverId, "  存在,超时客户端无返回值  getAllProducts")
+				fmt.Println(serverId, "  存在,超时客户端无返回值  getAllProducts ",proto.TcpProtoIDFbGetAllProducts)
 				res = `[]`
 				bw := []byte(res)
 				w.Write(bw)
@@ -92,11 +87,11 @@ func GetAllProducts(w http.ResponseWriter, r *http.Request){
 }
 
 func AddProduct(w http.ResponseWriter, r *http.Request){
-	AddOrUpdateProduct("addProduct", w, r)
+	AddOrUpdateProduct(proto.TcpProtoIDFbAddProduct, w, r)
 }
 
 func UpdateProduct(w http.ResponseWriter, r *http.Request){
-	AddOrUpdateProduct("updateProduct", w, r)
+	AddOrUpdateProduct(proto.TcpProtoIDFbUpdateProduct, w, r)
 }
 
 func DelProductById(w http.ResponseWriter, r *http.Request){
@@ -110,20 +105,17 @@ func DelProductById(w http.ResponseWriter, r *http.Request){
 		var res string
 		if exists {
 			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
-			b, err := codec.Encode(conn.RemoteAddr().String() + "|delProductById|" + string(JsonStr) + "|delete")
-			if err != nil {
-				fmt.Println(err)
-			}
-			conn.Write(b)
+			connid, _ := gomiddle.ConnMa[serverId]
+			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDFbDelProductById))	
 
 			select {
 			case x := <-gomiddle.Channel_c:
-				fmt.Println(serverId, "  存在,客户端有返回值  delProductById")
-				res = x[conn.RemoteAddr().String()+"_delProductById"]
+				fmt.Println(serverId, "  存在,客户端有返回值  delProductById ",proto.TcpProtoIDFbDelProductById)
+				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbDelProductById)]
 				bw := []byte(res)
 				w.Write(bw)
 			case <-time.After(time.Second * 3):
-				fmt.Println(serverId, "  存在,超时客户端无返回值  delProductById")
+				fmt.Println(serverId, "  存在,超时客户端无返回值  delProductById ",proto.TcpProtoIDFbDelProductById)
 				res = `{"message":"error"}`
 				bw := []byte(res)
 				w.Write(bw)
@@ -141,7 +133,7 @@ func GetProduct(w http.ResponseWriter, r *http.Request){
 }
 
 
-func AddOrUpdateProduct(m string, w http.ResponseWriter, r *http.Request) {
+func AddOrUpdateProduct(m uint16, w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		r.ParseForm()
 		result, _ := ioutil.ReadAll(r.Body)
@@ -158,16 +150,16 @@ func AddOrUpdateProduct(m string, w http.ResponseWriter, r *http.Request) {
 			var res string
 			if exists {
 				fmt.Println(key, "  存在   ", conn)
-				b,_ := codec.Encode(conn.RemoteAddr().String() + "|" + m + "|" + string(result) + "|post")
-				conn.Write(b)
+				connid, _ := gomiddle.ConnMa[key]
+				conn.Send(connid, makeNoticeMsg(string(result),m))
 				select {
 				case x := <-gomiddle.Channel_c:
-					fmt.Println(key, "  存在,客户端有返回值  AddOrUpdate")
-					res = x[conn.RemoteAddr().String()+"_"+m]
+					fmt.Println(key, "  存在,客户端有返回值  AddOrUpdate ",m)
+					res = x[string(connid)+"_"+string(m)]
 					bw := []byte(res)
 					w.Write(bw)
 				case <-time.After(time.Second * 1):
-					fmt.Println(key, "  存在,超时客户端无返回值  AddOrUpdate")
+					fmt.Println(key, "  存在,超时客户端无返回值  AddOrUpdate ",m)
 					res = `{"message":"error"}`
 					bw := []byte(res)
 					w.Write(bw)

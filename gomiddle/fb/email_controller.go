@@ -1,15 +1,15 @@
 package gomiddle
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"time"
+	"io/ioutil"
+	"encoding/json"
 	"strings"
-	"../../codec"
-	entity "../../entity"
 	"../../gomiddle"
+	entity "../../entity"
+	proto "../../tutorial/tcp"
 )
 
 type Ann struct{
@@ -36,7 +36,6 @@ func EmailHandler() {
 	http.HandleFunc("/fbserver/email/getEmailById", GetEmailById)
 }
 
-
 func GetAllEmails(w http.ResponseWriter, r *http.Request){
 	if r.Method == "GET" {
 		serverZoneId := r.FormValue("serverZoneId")
@@ -49,20 +48,17 @@ func GetAllEmails(w http.ResponseWriter, r *http.Request){
 		var res string
 		if exists {
 			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
-			b, err := codec.Encode(conn.RemoteAddr().String() + "|getAllEmails|" + string(JsonStr) + "|get")
-			if err != nil {
-				fmt.Println(err)
-			}
-			conn.Write(b)
+			connid, _ := gomiddle.ConnMa[serverId]
+			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDFbGetAllEmails))	
 			
 			select {
 			case x := <-gomiddle.Channel_c:
-				fmt.Println(serverId, "  存在,客户端有返回值  getAllEmails")
-				res = x[conn.RemoteAddr().String()+"_getAllEmails"]
+				fmt.Println(serverId, "  存在,客户端有返回值  getAllEmails ",proto.TcpProtoIDFbGetAllEmails)
+				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbGetAllEmails)]
 				bw := []byte(res)
 				w.Write(bw)
 			case <-time.After(time.Second * 3):
-				fmt.Println(serverId, "  存在,超时客户端无返回值  getAllEmails")
+				fmt.Println(serverId, "  存在,超时客户端无返回值  getAllEmails ",proto.TcpProtoIDFbGetAllEmails)
 				res = `[]`
 				bw := []byte(res)
 				w.Write(bw)
@@ -76,11 +72,11 @@ func GetAllEmails(w http.ResponseWriter, r *http.Request){
 }
 
 func AddEmail(w http.ResponseWriter, r *http.Request){
-	AddOrUpdateEmail("addEmail", w, r)
+	AddOrUpdateEmail(proto.TcpProtoIDFbAddEmail, w, r)
 }
 
 func UpdateEmail(w http.ResponseWriter, r *http.Request){
-	AddOrUpdateEmail("updateEmail", w, r)
+	AddOrUpdateEmail(proto.TcpProtoIDFbUpdateEmail, w, r)
 }
 
 func GetEmailById(w http.ResponseWriter, r *http.Request){
@@ -94,20 +90,17 @@ func GetEmailById(w http.ResponseWriter, r *http.Request){
 		var res string
 		if exists {
 			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
-			b, err := codec.Encode(conn.RemoteAddr().String() + "|getEmailById|" + string(JsonStr) + "|get")
-			if err != nil {
-				fmt.Println(err)
-			}
-			conn.Write(b)
+			connid, _ := gomiddle.ConnMa[serverId]
+			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDFbGetEmailById))	
 
 			select {
 			case x := <-gomiddle.Channel_c:
-				fmt.Println(serverId, "  存在,客户端有返回值  getEmailById")
-				res = x[conn.RemoteAddr().String()+"_getEmailById"]
+				fmt.Println(serverId, "  存在,客户端有返回值  getEmailById ",proto.TcpProtoIDFbGetEmailById)
+				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbGetEmailById)]
 				bw := []byte(res)
 				w.Write(bw)
 			case <-time.After(time.Second * 3):
-				fmt.Println(serverId, "  存在,超时客户端无返回值  getEmailById")
+				fmt.Println(serverId, "  存在,超时客户端无返回值  getEmailById ",proto.TcpProtoIDFbGetEmailById)
 				res = ``
 				bw := []byte(res)
 				w.Write(bw)
@@ -131,20 +124,17 @@ func DelEmailById(w http.ResponseWriter, r *http.Request){
 		var res string
 		if exists {
 			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
-			b, err := codec.Encode(conn.RemoteAddr().String() + "|delEmailById|" + string(JsonStr) + "|delete")
-			if err != nil {
-				fmt.Println(err)
-			}
-			conn.Write(b)
+			connid, _ := gomiddle.ConnMa[serverId]
+			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDFbDelEmailById))	
 
 			select {
 			case x := <-gomiddle.Channel_c:
-				fmt.Println(serverId, "  存在,客户端有返回值  delEmailById")
-				res = x[conn.RemoteAddr().String()+"_delEmailById"]
+				fmt.Println(serverId, "  存在,客户端有返回值  delEmailById ",proto.TcpProtoIDFbDelEmailById)
+				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbDelEmailById)]
 				bw := []byte(res)
 				w.Write(bw)
 			case <-time.After(time.Second * 3):
-				fmt.Println(serverId, "  存在,超时客户端无返回值  delEmailById")
+				fmt.Println(serverId, "  存在,超时客户端无返回值  delEmailById ",proto.TcpProtoIDFbDelEmailById)
 				res = `{"message":"error"}`
 				bw := []byte(res)
 				w.Write(bw)
@@ -158,7 +148,7 @@ func DelEmailById(w http.ResponseWriter, r *http.Request){
 }
 
 
-func AddOrUpdateEmail(m string, w http.ResponseWriter, r *http.Request) {
+func AddOrUpdateEmail(m uint16, w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		r.ParseForm()
 		result, _ := ioutil.ReadAll(r.Body)
@@ -179,17 +169,14 @@ func AddOrUpdateEmail(m string, w http.ResponseWriter, r *http.Request) {
 			conn, exists := gomiddle.ConnMap[key]
 			if exists {
 				fmt.Println(key, "  存在   ", conn)
-				b, err := codec.Encode(conn.RemoteAddr().String() + "|" + m + "|" + string(result) + "|post")
-				if err != nil {
-					continue
-				}
-				conn.Write(b)
+				connid, _ := gomiddle.ConnMa[key]
+				conn.Send(connid, makeNoticeMsg(string(result),m))
 
 				select {
 				case x := <-gomiddle.Channel_c:
-					fmt.Println(key, "  存在,客户端有返回值  AddOrUpdate")
+					fmt.Println(key, "  存在,客户端有返回值  AddOrUpdate ",m)
 					var responseList entity.ResponseList
-					if err := json.Unmarshal([]byte(x[conn.RemoteAddr().String()+"_"+m]), &responseList); err == nil {
+					if err := json.Unmarshal([]byte(x[string(connid)+"_"+string(m)]), &responseList); err == nil {
 						success = success + responseList.Success
 						fail = fail + responseList.Fail
 						if len(responseList.ObjFail) != 0 {
@@ -197,7 +184,7 @@ func AddOrUpdateEmail(m string, w http.ResponseWriter, r *http.Request) {
 						}
 					}
 				case <-time.After(time.Second * 3):
-					fmt.Println(key, "  存在,超时客户端无返回值  AddOrUpdate")
+					fmt.Println(key, "  存在,超时客户端无返回值  AddOrUpdate ",m)
 					fail = fail + 1
 					objFail = append(objFail, key)
 				}

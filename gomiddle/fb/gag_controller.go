@@ -1,14 +1,15 @@
 package gomiddle
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"time"
-	"../../codec"
+	"io/ioutil"
+	"encoding/json"
 	"../../gomiddle"
+	proto "../../tutorial/tcp"
 )
+
 
 type GagEntity struct{
 	ServerZoneId string
@@ -42,22 +43,17 @@ func GetAllGagAccount(w http.ResponseWriter, r *http.Request){
 		var res string
 		if exists {
 			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
-			b, err := codec.Encode(conn.RemoteAddr().String() + "|getAllGagAccount|" + string(JsonStr) + "|get")
-			if err != nil {
-				fmt.Println(err)
-			}
-			conn.Write(b)
-			//x := <-gomiddle.Channel_c
-			//res := x[conn.RemoteAddr().String()+"_getAllPlacards"]
+			connid, _ := gomiddle.ConnMa[serverId]
+			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDFbGetAllGagAccount))	
 
 			select {
 			case x := <-gomiddle.Channel_c:
-				fmt.Println(serverId, "  存在,客户端有返回值  getAllGagAccount")
-				res = x[conn.RemoteAddr().String()+"_getAllGagAccount"]
+				fmt.Println(serverId, "  存在,客户端有返回值  getAllGagAccount  ",proto.TcpProtoIDFbGetAllGagAccount)
+				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbGetAllGagAccount)]
 				bw := []byte(res)
 				w.Write(bw)
 			case <-time.After(time.Second * 1):
-				fmt.Println(serverId, "  存在,超时客户端无返回值  getAllGagAccount")
+				fmt.Println(serverId, "  存在,超时客户端无返回值  getAllGagAccount ",proto.TcpProtoIDFbGetAllGagAccount)
 				res = `[]`
 				bw := []byte(res)
 				w.Write(bw)
@@ -71,11 +67,11 @@ func GetAllGagAccount(w http.ResponseWriter, r *http.Request){
 }
 
 func AddGagAccount(w http.ResponseWriter, r *http.Request){
-	AddOrUpdateGag("addGagAccount", w, r)
+	AddOrUpdateGag(proto.TcpProtoIDFbAddGagAccount, w, r)
 }
 
 func UpdateGagAccount(w http.ResponseWriter, r *http.Request){
-	AddOrUpdateGag("updateGagAccount", w, r)
+	AddOrUpdateGag(proto.TcpProtoIDFbUpdateGagAccount, w, r)
 }
 
 func DelGagAccountById(w http.ResponseWriter, r *http.Request){
@@ -89,20 +85,17 @@ func DelGagAccountById(w http.ResponseWriter, r *http.Request){
 		var res string
 		if exists {
 			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
-			b, err := codec.Encode(conn.RemoteAddr().String() + "|delGagAccountById|" + string(JsonStr) + "|delete")
-			if err != nil {
-				fmt.Println(err)
-			}
-			conn.Write(b)
+			connid, _ := gomiddle.ConnMa[serverId]
+			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDFbDelGagAccountById))	
 
 			select {
 			case x := <-gomiddle.Channel_c:
-				fmt.Println(serverId, "  存在,客户端有返回值  delGagAccountById")
-				res = x[conn.RemoteAddr().String()+"_delGagAccountById"]
+				fmt.Println(serverId, "  存在,客户端有返回值  delGagAccountById ",proto.TcpProtoIDFbDelGagAccountById)
+				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbDelGagAccountById)]
 				bw := []byte(res)
 				w.Write(bw)
 			case <-time.After(time.Second * 1):
-				fmt.Println(serverId, "  存在,超时客户端无返回值  delGagAccountById")
+				fmt.Println(serverId, "  存在,超时客户端无返回值  delGagAccountById ",proto.TcpProtoIDFbDelGagAccountById)
 				res = `{"message":"error"}`
 				bw := []byte(res)
 				w.Write(bw)
@@ -115,7 +108,7 @@ func DelGagAccountById(w http.ResponseWriter, r *http.Request){
 	}
 }
 
-func AddOrUpdateGag(m string, w http.ResponseWriter, r *http.Request) {
+func AddOrUpdateGag(m uint16, w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		r.ParseForm()
 		result, _ := ioutil.ReadAll(r.Body)
@@ -124,22 +117,21 @@ func AddOrUpdateGag(m string, w http.ResponseWriter, r *http.Request) {
 		var s GagEntity
 		json.Unmarshal([]byte(result), &s)
 		ser := s.ServerId
-		fmt.Println(ser)
 		//判断serverid是否在ConnMap里
 		conn, exists := gomiddle.ConnMap[ser]
 		var res string
 		if exists {
 			fmt.Println(ser, "  存在   ", conn)
-			b,_ := codec.Encode(conn.RemoteAddr().String() + "|" + m + "|" + string(result) + "|post")
-			conn.Write(b)
+			connid, _ := gomiddle.ConnMa[ser]
+			conn.Send(connid, makeNoticeMsg(string(result),m))
 			select {
 			case x := <-gomiddle.Channel_c:
-				fmt.Println(ser, "  存在,客户端有返回值  AddOrUpdate")
-				res = x[conn.RemoteAddr().String()+"_"+m]
+				fmt.Println(ser, "  存在,客户端有返回值  AddOrUpdate ",m)
+				res = x[string(connid)+"_"+string(m)]
 				bw := []byte(res)
 				w.Write(bw)
 			case <-time.After(time.Second * 1):
-				fmt.Println(ser, "  存在,超时客户端无返回值  AddOrUpdate")
+				fmt.Println(ser, "  存在,超时客户端无返回值  AddOrUpdate ",m)
 				res = `{"message":"error"}`
 				bw := []byte(res)
 				w.Write(bw)
