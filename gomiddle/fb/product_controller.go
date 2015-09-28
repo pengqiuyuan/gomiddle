@@ -9,6 +9,7 @@ import (
 	"strings"
 	"../../gomiddle"
 	proto "../../tutorial/tcp"
+	entity "../../entity"
 )
 
 type ProductEntity struct{
@@ -144,33 +145,45 @@ func AddOrUpdateProduct(m uint16, w http.ResponseWriter, r *http.Request) {
 		ser := strings.Split(s.ServerId,",") 
 		fmt.Println(ser)
 				
+		choose := len(ser)
+		success := 0
+		fail := 0
+		var objFail []string
+
 		for _, key := range ser {
 			//判断serverid是否在ConnMap里
 			conn, exists := gomiddle.ConnMap[key]
-			var res string
 			if exists {
 				fmt.Println(key, "  存在   ", conn)
 				connid, _ := gomiddle.ConnMa[key]
 				conn.Send(connid, makeNoticeMsg(string(result),m))
+
 				select {
 				case x := <-gomiddle.Channel_c:
 					fmt.Println(key, "  存在,客户端有返回值  AddOrUpdate ",m)
-					res = x[string(connid)+"_"+string(m)]
-					bw := []byte(res)
-					w.Write(bw)
-				case <-time.After(time.Second * 1):
+					var responseList entity.ResponseList
+					if err := json.Unmarshal([]byte(x[string(connid)+"_"+string(m)]), &responseList); err == nil {
+						success = success + responseList.Success
+						fail = fail + responseList.Fail
+						if len(responseList.ObjFail) != 0 {
+							objFail = append(objFail, responseList.ObjFail[0])
+						}
+					}
+				case <-time.After(time.Second * 3):
 					fmt.Println(key, "  存在,超时客户端无返回值  AddOrUpdate ",m)
-					res = `{"message":"error"}`
-					bw := []byte(res)
-					w.Write(bw)
+					fail = fail + 1
+					objFail = append(objFail, key)
 				}
 			} else {
 				fmt.Println(key, "  不存在  ")
-				res = `{"message":"error"}`
-				bw := []byte(res)
-				w.Write(bw)
+				fail = fail + 1
+				objFail = append(objFail, key)
 			}
 		}
+		respons := entity.ResponseList{Choose: choose, Success: success, ObjFail: objFail, Fail: fail}
+		res, _ := json.Marshal(respons)
+		b := []byte(res)
+		w.Write(b)
 
 	}
 }

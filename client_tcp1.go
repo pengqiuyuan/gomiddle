@@ -39,17 +39,17 @@ func clientHandleMessage(id uint32, b []byte) {
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	}
-
+	
 	if m.Proto == proto.TcpProtoIDFbSaveGrayAccount {
 		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDFbGetGrayAccountById {
-		str := `{"id":1,"serverZoneId":"1","gameId":"1","serverId":"fb_server_1","platForm":"2","account":"2"}`
+		str := `{"id":1,"serverZoneId":"1","gameId":"1","serverId":"fb_server_1","platForm":"1","account":"1"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDFbGetAllGrayAccount {
-		str := `[{"id":1,"serverZoneId":"1","gameId":"1","serverId":"fb_server_1","platForm":"2","account":"2"}]`
+		str := `[{"id":1,"serverZoneId":"1","gameId":"1","serverId":"fb_server_1","platForm":"1","account":"1"}]`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDFbDelGrayAccountById {
@@ -215,7 +215,7 @@ func client() *tcp.Connector {
 }
 
 func main() {
-	str := `{"serverZoneId":1,"platForm":["1","2"],"serverId":"fb_server_1","gameId":1,"status":"1"}`
+	str := `{"serverZoneId":1,"platForm":["1","2"],"serverId":"fb_server_2","gameId":1,"status":"1"}`
 
 	log.SetFlags(log.Flags() | log.Lshortfile)
 	c = client()

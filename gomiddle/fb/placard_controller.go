@@ -6,6 +6,7 @@ import (
 	"time"
 	"log"
 	"io/ioutil"
+	"strings"
 	"encoding/json"
 	"../../gomiddle"
 	"enlightgame/transport"
@@ -198,9 +199,9 @@ func AddOrUpdatePlacard(m uint16, w http.ResponseWriter, r *http.Request) {
 		json.Unmarshal([]byte(result), &s)
 		//fmt.Println(s)
 		//多个serverId按，切分
-		//ser := strings.Split(s.ServerId, ",")
+		ser := strings.Split(s.ServerId, ",")
 
-		ser := s.ServerIds
+		//ser := s.ServerIds
 		choose := len(ser)
 		success := 0
 		fail := 0

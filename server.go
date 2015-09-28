@@ -148,6 +148,8 @@ func Handle() {
 }
 
 func FbHandle() {
+	fb.ServerHandler()
+	fb.GrayAccountHandler()
 	fb.PlacardHandler()
 	fb.GagHandler()
 	fb.SealHandler()
