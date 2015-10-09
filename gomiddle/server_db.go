@@ -85,6 +85,24 @@ func Delete_server(db *sql.DB,ip string,port string) {
     err = tx.Commit()
 }
 
+func Truncate_server(db *sql.DB) {
+    tx, err := db.Begin()
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer tx.Rollback()
+
+    stmt, err := tx.Prepare("TRUNCATE TABLE game_go_all_server")
+    defer stmt.Close()
+    if err != nil {
+        log.Fatal(err)
+        return
+    }
+
+    _,err = stmt.Exec()
+    err = tx.Commit()
+}
+
 
 func Select_all_server(db *sql.DB,serverZoneId int,gameId int,serverId string,ip string, port string,status string){
     stmt,err :=  db.Prepare("SELECT server_id FROM game_go_all_server WHERE server_id = ?")

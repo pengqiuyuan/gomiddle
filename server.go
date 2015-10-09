@@ -14,6 +14,7 @@ import (
 	"enlightgame/transport"
 	"os"
 	"os/signal"
+	"syscall"
 
 	hql "./gomiddle"
 	fb "./gomiddle/fb"
@@ -128,10 +129,11 @@ func main() {
 	a.HandleDisconnect(handleDisconnect)
 
 	ch := make(chan os.Signal)
-	signal.Notify(ch, os.Interrupt, os.Kill)
+	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)  
 	go a.Start()
 	go Handle()
 	<-ch
+	hql.Truncate_server(db)
 	a.Stop(shutdown)
 	wg.Wait()
 
