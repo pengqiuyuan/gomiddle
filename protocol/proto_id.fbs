@@ -39,7 +39,38 @@ enum TcpProtoID : ushort {
 	FbAddProduct,
 	FbUpdateProduct,
 	FbDelProductById,
-	FbGetProduct
+	FbGetProduct,
+	
+	KdsGetTotalByServerZoneIdAndGameId,
+
+	KdsUpdateServer,
+
+	KdsGetAllGrayAccount,
+	KdsSaveGrayAccount,
+	KdsUpdateGrayAccount,
+	KdsDelGrayAccountById,
+	KdsGetGrayAccountById,
+
+	KdsGetAllPlacards,
+	KdsSavePlacard,
+	KdsUpdatePlacards,
+	KdsDelPlacardById,
+	
+	KdsGetAllEmails,
+	KdsAddEmail,
+	KdsUpdateEmail,
+	KdsDelEmailById,
+	KdsGetEmailById,
+	
+	KdsGetAllGagAccount,
+	KdsAddGagAccount,
+	KdsUpdateGagAccount,
+	KdsDelGagAccountById,
+	
+	KdsGetAllSealAccount,
+	KdsAddSealAccount,
+	KdsUpdateSealAccount,
+	KdsDelSealAccount
 }
 
 

@@ -31,20 +31,20 @@ func Test(db *sql.DB) {
     }
 }
 
-func Insert_serverZone(db *sql.DB,serverZoneId int) {
+func Insert_serverZone(db *sql.DB,serverZoneId int,gameId int) {
     tx, err := db.Begin()
     if err != nil {
         log.Fatal(err)
     }
     defer tx.Rollback()
 
-    stmt, err := tx.Prepare("INSERT INTO game_go_serverzone(server_zone_id) VALUES(?)")
+    stmt, err := tx.Prepare("INSERT INTO game_go_serverzone(server_zone_id,store_id) VALUES(?,?)")
     defer stmt.Close()
     if err != nil {
         log.Fatal(err)
         return
     }
-    _,err = stmt.Exec(serverZoneId)
+    _,err = stmt.Exec(serverZoneId,gameId)
     err = tx.Commit()
 
 }

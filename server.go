@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 	_ "github.com/go-sql-driver/mysql"
 
 	"enlightgame/net/tcp"
@@ -18,6 +19,7 @@ import (
 
 	hql "./gomiddle"
 	fb "./gomiddle/fb"
+	kds "./gomiddle/kds"
 	proto "./tutorial/tcp"
 )
 
@@ -70,7 +72,7 @@ func handleMessage(id uint32, b []byte) {
 			hql.ConnM[id] = jsonServer.ServerId
 			sip := strings.Split(a.RemoteAddr(id), ":")
 			fmt.Printf("-->运营大区:%s 渠道:%s 服务器:%s 游戏:%s ip:%s 端口:%s 状态:%s\n", jsonServer.ServerZoneId, jsonServer.PlatForm, jsonServer.ServerId, int(jsonServer.GameId), sip[0], sip[1], jsonServer.Status)
-			hql.Insert_serverZone(db, int(jsonServer.ServerZoneId))
+			hql.Insert_serverZone(db, int(jsonServer.ServerZoneId),int(jsonServer.GameId))
 			hql.Insert_gameId(db, int(jsonServer.GameId))
 			for i := 0; i < len(jsonServer.PlatForm); i++ {
 				hql.Insert_all_platform(db, int(jsonServer.ServerZoneId), int(jsonServer.GameId), jsonServer.PlatForm[i], jsonServer.ServerId)
@@ -111,12 +113,14 @@ func init() {
 	p.BodySizeOffset = 21
 	p.BodySizeLen = 2
 	p.NotifyWithHead = true
-	a = tcp.NewAcceptor(":8898", p)	
+	a = tcp.NewAcceptor(":8888", p)	
 }
 
 func main() {
 	var err error
-	db, err = sql.Open("mysql", "root:123456@tcp(10.0.29.251:3306)/game_server?charset=utf8")
+	db, err = sql.Open("mysql", "root:123456@tcp(10.0.29.111:3305)/game_server?charset=utf8")
+	db.SetMaxOpenConns(50)
+    db.SetMaxIdleConns(50)
 	defer db.Close()
 	err = db.Ping()
 	if err != nil {
@@ -132,6 +136,7 @@ func main() {
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)  
 	go a.Start()
 	go Handle()
+	go pingHandle()
 	<-ch
 	hql.Truncate_server(db)
 	a.Stop(shutdown)
@@ -139,11 +144,22 @@ func main() {
 
 }
 
+func pingHandle(){
+	timer := time.NewTicker(20 * time.Minute)
+	for {
+	    select {
+	    case <-timer.C:
+			db.Ping()
+	    	log.Println(time.Now())
+	    }
+	}
+}
+
 func Handle() {
 	FbHandle()
 	KdsHandle()
 	KunHandle()
-	err := http.ListenAndServe(":8899", nil)
+	err := http.ListenAndServe(":8889", nil)
 	if err != nil {
 		log.Println("ListenAndServe: ", err)
 	}
@@ -160,7 +176,12 @@ func FbHandle() {
 }
 
 func KdsHandle() {
-
+	kds.ServerHandler()
+	kds.GrayAccountHandler()
+	kds.PlacardHandler()
+	kds.GagHandler()
+	kds.SealHandler()
+	kds.EmailHandler()
 }
 
 func KunHandle() {
