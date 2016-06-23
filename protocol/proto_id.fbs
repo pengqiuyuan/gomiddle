@@ -70,7 +70,39 @@ enum TcpProtoID : ushort {
 	KdsGetAllSealAccount,
 	KdsAddSealAccount,
 	KdsUpdateSealAccount,
-	KdsDelSealAccount
+	KdsDelSealAccount,
+	
+	
+	XyjGetTotalByServerZoneIdAndGameId,
+
+	XyjUpdateServer,
+
+	XyjGetAllGrayAccount,
+	XyjSaveGrayAccount,
+	XyjUpdateGrayAccount,
+	XyjDelGrayAccountById,
+	XyjGetGrayAccountById,
+
+	XyjGetAllPlacards,
+	XyjSavePlacard,
+	XyjUpdatePlacards,
+	XyjDelPlacardById,
+	
+	XyjGetAllEmails,
+	XyjAddEmail,
+	XyjUpdateEmail,
+	XyjDelEmailById,
+	XyjGetEmailById,
+	
+	XyjGetAllGagAccount,
+	XyjAddGagAccount,
+	XyjUpdateGagAccount,
+	XyjDelGagAccountById,
+	
+	XyjGetAllSealAccount,
+	XyjAddSealAccount,
+	XyjUpdateSealAccount,
+	XyjDelSealAccount
 }
 
 

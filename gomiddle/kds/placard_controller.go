@@ -213,6 +213,8 @@ func AddOrUpdatePlacard(m uint16, w http.ResponseWriter, r *http.Request) {
 			if exists {
 				fmt.Println(key, "  存在   ", conn)
 				connid, _ := gomiddle.ConnMa[key]
+				fmt.Println("1111111   "  + string(result));
+				fmt.Println(makeNoticeMsg(string(result),m));
 				conn.Send(connid, makeNoticeMsg(string(result),m))	
 
 				select {
