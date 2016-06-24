@@ -14,7 +14,7 @@ import (
 
 type Ann struct{
 	ItemId string
-	ItemNuM int
+	ItemNum string
 }
 
 type EmailEntity struct{

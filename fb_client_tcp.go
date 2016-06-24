@@ -215,7 +215,7 @@ func client() *tcp.Connector {
 }
 
 func main() {
-	str := `{"serverZoneId":1,"platForm":["1","2"],"serverId":"fb_server_1","gameId":1,"status":"1"}`
+	str := `{"serverZoneId":"1","platForm":["1","2"],"serverId":"fb_server_1","gameId":"1","status":"1"}`
 
 	log.SetFlags(log.Flags() | log.Lshortfile)
 	c = client()

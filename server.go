@@ -16,20 +16,22 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"strconv"
 
 	hql "./gomiddle"
 	fb "./gomiddle/fb"
 	kds "./gomiddle/kds"
+	xyj "./gomiddle/xyj"
 	proto "./tutorial/tcp"
 )
 
 
 
 type ServerInfoJson struct {
-	ServerZoneId int      `json:"serverZoneId"`
+	ServerZoneId string   `json:"serverZoneId"`
 	PlatForm     []string `json:"platForm"`
 	ServerId     string   `json:"serverId"`
-	GameId       int      `json:"gameId"`
+	GameId       string   `json:"gameId"`
 	Status       string   `json:"status"`
 }
 
@@ -66,18 +68,24 @@ func handleMessage(id uint32, b []byte) {
 		s := proto.GetRootAsNotice(t.Payload, 0)
 		var jsonServer ServerInfoJson
 		if err := json.Unmarshal(s.Content(), &jsonServer); err == nil {
+			zoneIdCvt,_ := strconv.ParseInt(jsonServer.ServerZoneId, 10, 32)
+			gameIdCvt,_ := strconv.ParseInt(jsonServer.GameId, 10, 32)
+			zoneId := int(zoneIdCvt)
+			gameId := int(gameIdCvt)
 			// 新连接加入map
 			hql.ConnMap[jsonServer.ServerId] = a
 			hql.ConnMa[jsonServer.ServerId] = id
 			hql.ConnM[id] = jsonServer.ServerId
 			sip := strings.Split(a.RemoteAddr(id), ":")
-			fmt.Printf("-->运营大区:%s 渠道:%s 服务器:%s 游戏:%s ip:%s 端口:%s 状态:%s\n", jsonServer.ServerZoneId, jsonServer.PlatForm, jsonServer.ServerId, int(jsonServer.GameId), sip[0], sip[1], jsonServer.Status)
-			hql.Insert_serverZone(db, int(jsonServer.ServerZoneId),int(jsonServer.GameId))
-			hql.Insert_gameId(db, int(jsonServer.GameId))
+			fmt.Printf("-->运营大区:%s 渠道:%s 服务器:%s 游戏:%s ip:%s 端口:%s 状态:%s\n", zoneId, jsonServer.PlatForm, jsonServer.ServerId, gameId, sip[0], sip[1], jsonServer.Status)
+			hql.Insert_serverZone(db, zoneId,gameId)
+			hql.Insert_gameId(db, gameId)
 			for i := 0; i < len(jsonServer.PlatForm); i++ {
-				hql.Insert_all_platform(db, int(jsonServer.ServerZoneId), int(jsonServer.GameId), jsonServer.PlatForm[i], jsonServer.ServerId)
+				hql.Insert_all_platform(db, zoneId, gameId, jsonServer.PlatForm[i], jsonServer.ServerId)
 			}
-			hql.Select_all_server(db, int(jsonServer.ServerZoneId), int(jsonServer.GameId), jsonServer.ServerId, sip[0], sip[1], jsonServer.Status)
+			hql.Select_all_server(db,zoneId, gameId, jsonServer.ServerId, sip[0], sip[1], jsonServer.Status)
+		}else{
+			fmt.Println(err)
 		}
 	} else {
 		// 从消息payload部分获取正文内容
@@ -159,6 +167,7 @@ func Handle() {
 	FbHandle()
 	KdsHandle()
 	KunHandle()
+	XyjHandle()
 	err := http.ListenAndServe(":8889", nil)
 	if err != nil {
 		log.Println("ListenAndServe: ", err)
@@ -186,4 +195,13 @@ func KdsHandle() {
 
 func KunHandle() {
 
+}
+
+func XyjHandle(){
+	xyj.ServerHandler()
+	xyj.GrayAccountHandler()
+	xyj.PlacardHandler()
+	xyj.GagHandler()
+	xyj.SealHandler()
+	xyj.EmailHandler()
 }
