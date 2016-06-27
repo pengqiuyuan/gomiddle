@@ -85,6 +85,24 @@ func Delete_server(db *sql.DB,ip string,port string) {
     err = tx.Commit()
 }
 
+func Delete_platform(db *sql.DB,ip string,port string) {
+    tx, err := db.Begin()
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer tx.Rollback()
+
+    stmt, err := tx.Prepare("DELETE FROM game_go_platform WHERE ip=? and port=?")
+    defer stmt.Close()
+    if err != nil {
+        log.Fatal(err)
+        return
+    }
+
+    _,err = stmt.Exec(ip,port)
+    err = tx.Commit()
+}
+
 func Truncate_server(db *sql.DB) {
     tx, err := db.Begin()
     if err != nil {
@@ -93,6 +111,24 @@ func Truncate_server(db *sql.DB) {
     defer tx.Rollback()
 
     stmt, err := tx.Prepare("TRUNCATE TABLE game_go_all_server")
+    defer stmt.Close()
+    if err != nil {
+        log.Fatal(err)
+        return
+    }
+
+    _,err = stmt.Exec()
+    err = tx.Commit()
+}
+
+func Truncate_platform(db *sql.DB) {
+    tx, err := db.Begin()
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer tx.Rollback()
+
+    stmt, err := tx.Prepare("TRUNCATE TABLE game_go_all_platform")
     defer stmt.Close()
     if err != nil {
         log.Fatal(err)
@@ -154,19 +190,19 @@ func Select_all_server(db *sql.DB,serverZoneId int,gameId int,serverId string,ip
 
 }
 
-func Insert_all_platform(db *sql.DB,serverZoneId int,gameId int,platFormId string,serverId string) {
+func Insert_all_platform(db *sql.DB,serverZoneId int,gameId int,platFormId string,serverId string,ip string, port string) {
     tx, err := db.Begin()
     if err != nil {
         log.Fatal(err)
     }
     defer tx.Rollback()
 
-    stmt, err := tx.Prepare("INSERT INTO game_go_all_platform(server_zone_id,store_id,plat_form_id,server_id) VALUES(?,?,?,?)")
+    stmt, err := tx.Prepare("INSERT INTO game_go_all_platform(server_zone_id,store_id,plat_form_id,server_id,ip,port) VALUES(?,?,?,?,?,?)")
     defer stmt.Close()
     if err != nil {
         log.Println(err)
         return
     }
-    stmt.Exec(serverZoneId,gameId,platFormId,serverId)
+    stmt.Exec(serverZoneId,gameId,platFormId,serverId,ip,port)
     err = tx.Commit()
 }

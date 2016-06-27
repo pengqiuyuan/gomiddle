@@ -81,7 +81,7 @@ func handleMessage(id uint32, b []byte) {
 			hql.Insert_serverZone(db, zoneId,gameId)
 			hql.Insert_gameId(db, gameId)
 			for i := 0; i < len(jsonServer.PlatForm); i++ {
-				hql.Insert_all_platform(db, zoneId, gameId, jsonServer.PlatForm[i], jsonServer.ServerId)
+				hql.Insert_all_platform(db, zoneId, gameId, jsonServer.PlatForm[i], jsonServer.ServerId, sip[0], sip[1])
 			}
 			hql.Select_all_server(db,zoneId, gameId, jsonServer.ServerId, sip[0], sip[1], jsonServer.Status)
 		}else{
@@ -92,6 +92,7 @@ func handleMessage(id uint32, b []byte) {
 		s := proto.GetRootAsNotice(t.Payload, 0)
 		//   1_2   {"choose":1,"success":1,"objFail":["我是返回来的消息"],"fail":1}
 		hql.ResponseMap[string(id)+"_"+string(m.Proto)] = string(s.Content())
+		fmt.Println("1111 " + string(s.Content()))
 		hql.Channel_c <- hql.ResponseMap
 	}
 	
@@ -112,6 +113,7 @@ func handleDisconnect(id uint32) {
 	sip := strings.Split(a.RemoteAddr(id), ":")
 	//mysql删除对应保存的客户端信息
 	hql.Delete_server(db, sip[0], sip[1])
+	hql.Delete_platform(db, sip[0], sip[1])
 }
 
 func init() {
@@ -147,6 +149,7 @@ func main() {
 	go pingHandle()
 	<-ch
 	hql.Truncate_server(db)
+	hql.Truncate_platform(db)
 	a.Stop(shutdown)
 	wg.Wait()
 
