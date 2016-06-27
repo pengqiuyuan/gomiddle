@@ -35,13 +35,13 @@ func clientHandleMessage(id uint32, b []byte) {
 	log.Printf("recv notice! %v %v %v", m.Flag, m.Proto, m.Size)
 
 	if m.Proto == proto.TcpProtoIDXyjUpdateServer {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	}
 
 	if m.Proto == proto.TcpProtoIDXyjSaveGrayAccount {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDXyjGetGrayAccountById {
@@ -57,13 +57,13 @@ func clientHandleMessage(id uint32, b []byte) {
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDXyjUpdateGrayAccount {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	}
 
 	if m.Proto == proto.TcpProtoIDXyjSavePlacard {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDXyjGetTotalByServerZoneIdAndGameId {
@@ -79,7 +79,7 @@ func clientHandleMessage(id uint32, b []byte) {
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDXyjUpdatePlacards {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	}
@@ -89,11 +89,11 @@ func clientHandleMessage(id uint32, b []byte) {
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDXyjAddEmail {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDXyjUpdateEmail {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDXyjDelEmailById {
@@ -188,7 +188,7 @@ func client() *tcp.Connector {
 	p.BodySizeOffset = 21
 	p.BodySizeLen = 2
 	p.NotifyWithHead = true
-	c := tcp.NewConnector(id, "10.0.29.111:8888", p)
+	c := tcp.NewConnector(id, "10.0.29.152:8888", p)
 	c.HandleMessage(clientHandleMessage)
 	c.HandleConnect(handleConnect)
 	c.HandleDisconnect(handleDisconnect)
@@ -197,7 +197,7 @@ func client() *tcp.Connector {
 }
 
 func main() {
-	str := `{"serverZoneId":"2","platForm":["2","3"],"serverId":"xyj_server_test","gameId":"4","status":"1"}`
+	str := `{"serverZoneId":"1","platForm":["2","3"],"serverId":"xyj_server_test","gameId":"4","status":"1"}`
 
 	log.SetFlags(log.Flags() | log.Lshortfile)
 	c = client()

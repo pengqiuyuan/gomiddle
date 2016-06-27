@@ -35,13 +35,13 @@ func clientHandleMessage(id uint32, b []byte) {
 	log.Printf("recv notice! %v %v %v", m.Flag, m.Proto, m.Size)
 
 	if m.Proto == proto.TcpProtoIDFbUpdateServer {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	}
 
 	if m.Proto == proto.TcpProtoIDFbSaveGrayAccount {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDFbGetGrayAccountById {
@@ -57,13 +57,13 @@ func clientHandleMessage(id uint32, b []byte) {
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDFbUpdateGrayAccount {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	}
 
 	if m.Proto == proto.TcpProtoIDFbSavePlacard {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDFbGetTotalByServerZoneIdAndGameId {
@@ -79,7 +79,7 @@ func clientHandleMessage(id uint32, b []byte) {
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDFbUpdatePlacards {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	}
@@ -89,11 +89,11 @@ func clientHandleMessage(id uint32, b []byte) {
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDFbAddEmail {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDFbUpdateEmail {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDFbDelEmailById {
@@ -149,11 +149,11 @@ func clientHandleMessage(id uint32, b []byte) {
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDFbAddProduct {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":1,"success":1,"objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDFbUpdateProduct {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDFbDelProductById {

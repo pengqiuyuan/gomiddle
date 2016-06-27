@@ -35,13 +35,13 @@ func clientHandleMessage(id uint32, b []byte) {
 	log.Printf("recv notice! %v %v %v", m.Flag, m.Proto, m.Size)
 
 	if m.Proto == proto.TcpProtoIDKdsUpdateServer {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	}
 
 	if m.Proto == proto.TcpProtoIDKdsSaveGrayAccount {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDKdsGetGrayAccountById {
@@ -57,13 +57,13 @@ func clientHandleMessage(id uint32, b []byte) {
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDKdsUpdateGrayAccount {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	}
 
 	if m.Proto == proto.TcpProtoIDKdsSavePlacard {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDKdsGetTotalByServerZoneIdAndGameId {
@@ -79,7 +79,7 @@ func clientHandleMessage(id uint32, b []byte) {
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDKdsUpdatePlacards {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	}
@@ -89,11 +89,11 @@ func clientHandleMessage(id uint32, b []byte) {
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDKdsAddEmail {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDKdsUpdateEmail {
-		str := `{"choose":1,"success":1,"objFail":[],"fail":0}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDKdsDelEmailById {

@@ -92,7 +92,7 @@ func Delete_platform(db *sql.DB,ip string,port string) {
     }
     defer tx.Rollback()
 
-    stmt, err := tx.Prepare("DELETE FROM game_go_platform WHERE ip=? and port=?")
+    stmt, err := tx.Prepare("DELETE FROM game_go_all_platform WHERE ip=? and port=?")
     defer stmt.Close()
     if err != nil {
         log.Fatal(err)

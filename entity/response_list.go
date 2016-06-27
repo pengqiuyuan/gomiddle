@@ -1,8 +1,8 @@
 package entity
 
 type ResponseList struct {
-	Choose   int      `json:"choose"`
-	Success  int      `json:"success"`
+	Choose   string   `json:"choose"`
+	Success  string   `json:"success"`
 	ObjFail  []string `json:"objFail"`
-	Fail     int      `json:"fail"`
+	Fail     string   `json:"fail"`
 }

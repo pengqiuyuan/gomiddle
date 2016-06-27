@@ -159,11 +159,7 @@ func AddOrUpdateEmail(m uint16, w http.ResponseWriter, r *http.Request) {
 		fmt.Println(s)
 		//多个serverId按，切分
 		ser := strings.Split(s.ServerId, ",")
-		choose := len(ser)
-		success := 0
-		fail := 0
-		var objFail []string
-
+		var res,objF string
 		for _, key := range ser {
 			//判断serverid是否在ConnMap里
 			conn, exists := gomiddle.ConnMap[key]
@@ -174,28 +170,26 @@ func AddOrUpdateEmail(m uint16, w http.ResponseWriter, r *http.Request) {
 
 				select {
 				case x := <-gomiddle.Channel_c:
-					fmt.Println(key, "  存在,客户端有返回值  AddOrUpdate ",m)
+					fmt.Println(key, "  存在,客户端有返回值  AddOrUpdate ",m)		
 					var responseList entity.ResponseList
+			
 					if err := json.Unmarshal([]byte(x[string(connid)+"_"+string(m)]), &responseList); err == nil {
-						success = success + responseList.Success
-						fail = fail + responseList.Fail
 						if len(responseList.ObjFail) != 0 {
-							objFail = append(objFail, responseList.ObjFail[0])
+							objF = responseList.ObjFail[0]
 						}
+						res = `{"choose":"` + responseList.Choose + `","success":"` + responseList.Success + `","objFail":"` + objF + `","fail":"` + responseList.Fail + `"}`
 					}
+					
 				case <-time.After(time.Second * 3):
-					fmt.Println(key, "  存在,超时客户端无返回值  AddOrUpdate ",m)
-					fail = fail + 1
-					objFail = append(objFail, key)
+					fmt.Println(key, "  存在,超时客户端无返回值  AddOrUpdate ",m)					
+					res = `{"choose":"1","success":"0","objFail":"` + key + `","fail":"1"}`
+					
 				}
 			} else {
 				fmt.Println(key, "  不存在  ")
-				fail = fail + 1
-				objFail = append(objFail, key)
+				res = `{"choose":"1","success":"0","objFail":"` + key + `","fail":"1"}`
 			}
 		}
-		respons := entity.ResponseList{Choose: choose, Success: success, ObjFail: objFail, Fail: fail}
-		res, _ := json.Marshal(respons)
 		b := []byte(res)
 		w.Write(b)
 	}
