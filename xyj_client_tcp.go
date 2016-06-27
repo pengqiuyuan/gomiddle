@@ -85,11 +85,11 @@ func clientHandleMessage(id uint32, b []byte) {
 	}
 
 	if m.Proto == proto.TcpProtoIDXyjGetAllEmails {
-		str := `[{"id":1,"serverZoneId":"1","gameId":"1","serverId":"xyj_server_1","sender":"1","title":"1","contents":"1","annex":[{"itemId":"1","itemNum":1},{"itemId":"1","itemNum":1},{"itemId":"112","itemNum":1123}] }]`
+		str := `[{"id":1,"serverZoneId":"1","gameId":"1","serverId":"xyj_server_test","sender":"1","title":"1","contents":"1","annex":[{"itemId":"1","itemNum":1},{"itemId":"1","itemNum":1},{"itemId":"112","itemNum":1123}] }]`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDXyjAddEmail {
-		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
+		str := `{"choose":"1","success":"0","objFail":["我是一个测试"],"fail":"1"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDXyjUpdateEmail {
