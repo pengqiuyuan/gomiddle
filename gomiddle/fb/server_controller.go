@@ -8,7 +8,6 @@ import (
 	"strings"
 	"encoding/json"
 	"../../gomiddle"
-	entity "../../entity"
 	proto "../../tutorial/tcp"
 )
 
@@ -19,6 +18,13 @@ type ServerEntity struct {
 	Status       string
 }
 
+type ResponseList struct {
+	Choose   string   `json:"choose"`
+	Success  string   `json:"success"`
+	ObjFail  []string `json:"objFail"`
+	Fail     string   `json:"fail"`
+	Status   string   `json:"status"`
+}
 
 func ServerHandler() {
 	http.HandleFunc("/fbserver/server/updateServers", UpdateServers)
@@ -53,23 +59,25 @@ func AddOrUpdateServer(m uint16, w http.ResponseWriter, r *http.Request) {
 				select {
 				case x := <-gomiddle.Channel_c:
 					fmt.Println(key, "  存在,客户端有返回值  AddOrUpdate ",m)		
-					var responseList entity.ResponseList
+					var responseList ResponseList
 			
 					if err := json.Unmarshal([]byte(x[string(connid)+"_"+string(m)]), &responseList); err == nil {
 						if len(responseList.ObjFail) != 0 {
 							objF = responseList.ObjFail[0]
 						}
-						res = `{"choose":"` + responseList.Choose + `","success":"` + responseList.Success + `","objFail":"` + objF + `","fail":"` + responseList.Fail + `"}`
+						res = `{"choose":"` + responseList.Choose + `","success":"` + responseList.Success + `","objFail":"` + objF + `","fail":"` + responseList.Fail + `","status":"` + responseList.Status+ `"}`
 					}
 					
 				case <-time.After(time.Second * 1):
-					fmt.Println(key, "  存在,超时客户端无返回值  AddOrUpdate ",m)					
-					res = `{"choose":"1","success":"0","objFail":"` + key + `","fail":"1"}`
+					fmt.Println(key, "  存在,超时客户端无返回值  AddOrUpdate ",m)	
+					//web server 修改服务器状态，游戏服务器存在但没有响应，返回-1				
+					res = `{"choose":"1","success":"0","objFail":"` + key + `","fail":"1","status":"-1"}`
 					
 				}
 			} else {
 				fmt.Println(key, "  不存在  ")
-				res = `{"choose":"1","success":"0","objFail":"` + key + `","fail":"1"}`
+				//web server 修改服务器状态，gomiddle服务器与游戏服务器断连，返回-2
+				res = `{"choose":"1","success":"0","objFail":"` + key + `","fail":"1","status":"-2"}`
 			}
 		}
 		b := []byte(res)

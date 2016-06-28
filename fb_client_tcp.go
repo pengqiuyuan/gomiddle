@@ -35,7 +35,7 @@ func clientHandleMessage(id uint32, b []byte) {
 	log.Printf("recv notice! %v %v %v", m.Flag, m.Proto, m.Size)
 
 	if m.Proto == proto.TcpProtoIDFbUpdateServer {
-		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0","status":"3"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	}
