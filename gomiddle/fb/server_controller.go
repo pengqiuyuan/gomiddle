@@ -13,9 +13,12 @@ import (
 )
 
 type ServerEntity struct {
-	ServerId   string
-	Status     string
+	GameId       string
+	ServerZoneId string
+	ServerId     string
+	Status       string
 }
+
 
 func ServerHandler() {
 	http.HandleFunc("/fbserver/server/updateServers", UpdateServers)
