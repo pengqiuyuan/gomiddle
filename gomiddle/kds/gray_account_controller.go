@@ -70,8 +70,9 @@ func DelGrayAccountById(w http.ResponseWriter, r *http.Request) {
 		serverZoneId := r.FormValue("serverZoneId")
 		gameId := r.FormValue("gameId")
 		serverId := r.FormValue("serverId")
-		id := r.FormValue("id")
-		JsonStr := `{"serverZoneId":"` + serverZoneId + `","gameId":"` + gameId + `","serverId":"` + serverId + `","id":"` + id + `"}`
+		platForm := r.FormValue("platForm")
+		account := r.FormValue("account")
+		JsonStr := `{"serverZoneId":"` + serverZoneId + `","gameId":"` + gameId + `","serverId":"` + serverId + `","platForm":"` + platForm + `","account":"` + account + `"}`
 		conn, exists := gomiddle.ConnMap[serverId]
 		var res string
 		if exists {
