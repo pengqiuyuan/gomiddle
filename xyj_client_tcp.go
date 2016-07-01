@@ -45,11 +45,11 @@ func clientHandleMessage(id uint32, b []byte) {
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDXyjGetGrayAccountById {
-		str := `{"id":1,"serverZoneId":"1","gameId":"1","serverId":"xyj_server_test","grayList":[]}`
+		str := `{"id":1,"serverZoneId":"1","gameId":"1","serverId":"xyj_server_test","grayList":["account": "88888888","platForm": "qq"]}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDXyjGetAllGrayAccount {
-		str := `{"serverZoneId":"1","gameId":"1","serverId":"xyj_server_test","grayList":[]}`
+		str := `{"serverZoneId":"1","gameId":"1","serverId":"xyj_server_test","grayList":["account": "88888888","platForm": "qq"]}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDXyjDelGrayAccountById {
@@ -188,7 +188,7 @@ func client() *tcp.Connector {
 	p.BodySizeOffset = 21
 	p.BodySizeLen = 2
 	p.NotifyWithHead = true
-	c := tcp.NewConnector(id, "10.0.29.111:8888", p)
+	c := tcp.NewConnector(id, "10.0.29.152:8888", p)
 	c.HandleMessage(clientHandleMessage)
 	c.HandleConnect(handleConnect)
 	c.HandleDisconnect(handleDisconnect)
