@@ -71,7 +71,7 @@ func clientHandleMessage(id uint32, b []byte) {
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDKdsGetAllPlacards {
-		str := `[{"id":1,"serverZoneId":"1","gameId":"1","serverId":"kds_server_1","version":"1","contents":"1"}]`
+		str := `{"placardList":[{"id":1,"serverZoneId":"1","gameId":"1","serverId":"xyj_server_test","version":"1","contents":"1"}]}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDKdsDelPlacardById {
@@ -80,6 +80,10 @@ func clientHandleMessage(id uint32, b []byte) {
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDKdsUpdatePlacards {
 		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
+		m := makeNoticeMsg(str, m.Proto)
+		c.Send(m)
+	} else if m.Proto == proto.TcpProtoIDXyjGetPlacardById {
+		str := `{"id":1,"serverZoneId":"1","gameId":"1","serverId":"xyj_server_test","version":"1","contents":"我们来了"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	}
