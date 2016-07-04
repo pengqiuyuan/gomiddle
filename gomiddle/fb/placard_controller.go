@@ -30,6 +30,7 @@ func PlacardHandler() {
 	http.HandleFunc("/fbserver/placard/addPlacards", SavePlacard)
 	http.HandleFunc("/fbserver/placard/updatePlacards", UpdatePlacards)
 	http.HandleFunc("/fbserver/placard/delPlacardById", DelPlacardById)
+	http.HandleFunc("/fbserver/placard/getPlacardById", GetPlacardById)
 }
 
 func makeNoticeMsg(str string,p uint16) []byte {
@@ -88,12 +89,12 @@ func GetAllPlacards(w http.ResponseWriter, r *http.Request) {
 				w.Write(bw)
 			case <-time.After(time.Second * 1):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  getAllPlacards  " , proto.TcpProtoIDFbGetAllPlacards)
-				res = `[]`
+				res = `{"placardList": []}`
 				bw := []byte(res)
 				w.Write(bw)
 			}
 		}else {
-			res = `[]`
+			res = `{"placardList": []}`
 			bw := []byte(res)
 			w.Write(bw)
 		}
@@ -134,6 +135,40 @@ func GetTotalByServerZoneIdAndGameId(w http.ResponseWriter, r *http.Request) {
 			}
 		} else {
 			res = `{"num":0}`
+			bw := []byte(res)
+			w.Write(bw)
+		}
+	}
+}
+
+func GetPlacardById(w http.ResponseWriter, r *http.Request){
+	if r.Method == "GET" {
+		serverZoneId := r.FormValue("serverZoneId")
+		gameId := r.FormValue("gameId")
+		serverId := r.FormValue("serverId")
+		id := r.FormValue("id")
+		JsonStr := `{"serverZoneId":"` + serverZoneId + `","gameId":"` + gameId + `","serverId":"` + serverId + `","id":"` + id + `"}`
+		conn, exists := gomiddle.ConnMap[serverId]
+		var res string
+		if exists {
+			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
+			connid, _ := gomiddle.ConnMa[serverId]
+			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDFbGetPlacardById))	
+
+			select {
+			case x := <-gomiddle.Channel_c:
+				fmt.Println(serverId, "  存在,客户端有返回值  GetPlacardById ",proto.TcpProtoIDFbGetPlacardById)
+				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbGetPlacardById)]
+				bw := []byte(res)
+				w.Write(bw)
+			case <-time.After(time.Second * 1):
+				fmt.Println(serverId, "  存在,超时客户端无返回值  GetPlacardById ",proto.TcpProtoIDFbGetPlacardById)
+				res = `{}`
+				bw := []byte(res)
+				w.Write(bw)
+			}
+		} else {
+			res = `{}`
 			bw := []byte(res)
 			w.Write(bw)
 		}
