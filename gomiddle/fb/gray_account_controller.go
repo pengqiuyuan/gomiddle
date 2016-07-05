@@ -53,12 +53,12 @@ func GetAllGrayAccount(w http.ResponseWriter, r *http.Request) {
 				w.Write(bw)
 			case <-time.After(time.Second * 1):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  GetAllGrayAccount  " , proto.TcpProtoIDFbGetAllGrayAccount)
-				res = `{}`
+				res = `{"serverZoneId":"` + serverZoneId + `","gameId":"` + gameId + `","serverId":"` + serverId + `","grayList":[]}`
 				bw := []byte(res)
 				w.Write(bw)
 			}
 		}else {
-			res = `{}`
+			res = `{"serverZoneId":"` + serverZoneId + `","gameId":"` + gameId + `","serverId":"` + serverId + `","grayList":[]}`
 			bw := []byte(res)
 			w.Write(bw)
 		}
