@@ -49,7 +49,7 @@ func clientHandleMessage(id uint32, b []byte) {
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDFbGetAllGrayAccount {
-		str := `[{"id":1,"serverZoneId":"1","gameId":"1","serverId":"fb_server_1","platForm":"2","account":"2"}]`
+		str := `[{"account": "88888888","platForm": "qq"},{"account": "555","platForm": "3434"}]`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDFbDelGrayAccountById {

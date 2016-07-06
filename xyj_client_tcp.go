@@ -45,11 +45,11 @@ func clientHandleMessage(id uint32, b []byte) {
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDXyjGetGrayAccountById {
-		str := `{"id":1,"serverZoneId":"1","gameId":"1","serverId":"xyj_server_test","grayList":[{"account": "88888888","platForm": "qq"},{"account": "555","platForm": "3434"}]}`
+		str := `{"id":1,"serverZoneId":"1","gameId":"1","serverId":"kds_server_1","platForm":"2","account":"2"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDXyjGetAllGrayAccount {
-		str := `{"serverZoneId":"1","gameId":"1","serverId":"xyj_server_test","grayList":[{"account": "88888888","platForm": "qq"},{"account": "555","platForm": "3434"}]}`
+		str := `[{"account": "88888888","platForm": "qq"},{"account": "555","platForm": "3434"}]`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDXyjDelGrayAccountById {
