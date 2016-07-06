@@ -71,7 +71,7 @@ func clientHandleMessage(id uint32, b []byte) {
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDFbGetAllPlacards {
-		str := `{"placardList":[{"id":1,"serverZoneId":"1","gameId":"1","serverId":"xyj_server_test","version":"1","contents":"1"}]}`
+		str := `[{"id":1,"serverZoneId":"1","gameId":"1","serverId":"xyj_server_test","version":"1","contents":"1"}]`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDFbDelPlacardById {
