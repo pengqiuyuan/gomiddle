@@ -26,6 +26,7 @@ func SealHandler() {
 	http.HandleFunc("/xyjserver/seal/addSealAccount", AddSealAccount)
 	http.HandleFunc("/xyjserver/seal/updateSealAccount", UpdateSealAccount)
 	http.HandleFunc("/xyjserver/seal/delSealAccount", DelSealAccount)
+	http.HandleFunc("/xyjserver/seal/getTotalByServerZoneIdAndGameId", TcpProtoIDXyjSealGetTotalByServerZoneIdAndGameId)
 }
 
 func GetAllSealAccount(w http.ResponseWriter, r *http.Request) {
@@ -141,5 +142,41 @@ func AddOrUpdateSeal(m uint16, w http.ResponseWriter, r *http.Request) {
 			w.Write(bw)
 		}
 
+	}
+}
+
+func TcpProtoIDXyjSealGetTotalByServerZoneIdAndGameId(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		serverZoneId := r.FormValue("serverZoneId")
+		gameId := r.FormValue("gameId")
+		category := r.FormValue("category")
+		serverId := r.FormValue("serverId")
+		JsonStr := `{"serverZoneId":"` + serverZoneId + `","gameId":"` + gameId + `","category":"` + category + `","serverId":"` + serverId + `"}`
+
+		conn, exists := gomiddle.ConnMap[serverId]
+		var res string
+		if exists {
+			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
+			
+			connid, _ := gomiddle.ConnMa[serverId]
+			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDXyjSealGetTotalByServerZoneIdAndGameId))	
+
+			select {
+			case x := <-gomiddle.Channel_c:
+				fmt.Println(serverId, "  存在,客户端有返回值  TcpProtoIDXyjSealGetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDXyjSealGetTotalByServerZoneIdAndGameId)
+				res = x[string(connid)+"_"+string(proto.TcpProtoIDXyjSealGetTotalByServerZoneIdAndGameId)]
+				bw := []byte(res)
+			    w.Write(bw)
+			case <-time.After(time.Second * 1):
+				fmt.Println(serverId, "  存在,超时客户端无返回值  TcpProtoIDXyjSealGetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDXyjSealGetTotalByServerZoneIdAndGameId)
+				res = `{"num":0}`
+				bw := []byte(res)
+				w.Write(bw)
+			}
+		} else {
+			res = `{"num":0}`
+			bw := []byte(res)
+			w.Write(bw)
+		}
 	}
 }
