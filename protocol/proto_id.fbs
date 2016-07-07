@@ -3,104 +3,114 @@ namespace tutorial.tcp;
 enum TcpProtoID : ushort {
     GmStatus,
     GmReturnNotice,
-	
-	FbGetTotalByServerZoneIdAndGameId,
 
 	FbUpdateServer,
 
+	FbGrayGetTotalByServerZoneIdAndGameId,
 	FbGetAllGrayAccount,
 	FbSaveGrayAccount,
 	FbUpdateGrayAccount,
 	FbDelGrayAccountById,
 	FbGetGrayAccountById,
 
+	FbPlacardGetTotalByServerZoneIdAndGameId,
 	FbGetAllPlacards,
 	FbSavePlacard,
 	FbUpdatePlacards,
 	FbDelPlacardById,
 	FbGetPlacardById,
 	
+	FbEmailGetTotalByServerZoneIdAndGameId,
 	FbGetAllEmails,
 	FbAddEmail,
 	FbUpdateEmail,
 	FbDelEmailById,
 	FbGetEmailById,
 	
+	FbGagGetTotalByServerZoneIdAndGameId,
 	FbGetAllGagAccount,
 	FbAddGagAccount,
 	FbUpdateGagAccount,
 	FbDelGagAccountById,
 	
+	FbSealGetTotalByServerZoneIdAndGameId,
 	FbGetAllSealAccount,
 	FbAddSealAccount,
 	FbUpdateSealAccount,
 	FbDelSealAccount,
 	
+	FbProductGetTotalByServerZoneIdAndGameId,
 	FbGetAllProducts,
 	FbAddProduct,
 	FbUpdateProduct,
 	FbDelProductById,
 	FbGetProduct,
 	
-	KdsGetTotalByServerZoneIdAndGameId,
-
 	KdsUpdateServer,
 
+	KdsGrayGetTotalByServerZoneIdAndGameId,
 	KdsGetAllGrayAccount,
 	KdsSaveGrayAccount,
 	KdsUpdateGrayAccount,
 	KdsDelGrayAccountById,
 	KdsGetGrayAccountById,
 
+	KdsPlacardGetTotalByServerZoneIdAndGameId,
 	KdsGetAllPlacards,
 	KdsSavePlacard,
 	KdsUpdatePlacards,
 	KdsDelPlacardById,
+	KdsGetPlacardById,
 	
+	KdsEmailGetTotalByServerZoneIdAndGameId,
 	KdsGetAllEmails,
 	KdsAddEmail,
 	KdsUpdateEmail,
 	KdsDelEmailById,
 	KdsGetEmailById,
 	
+	KdsGagGetTotalByServerZoneIdAndGameId,
 	KdsGetAllGagAccount,
 	KdsAddGagAccount,
 	KdsUpdateGagAccount,
 	KdsDelGagAccountById,
 	
+	KdsSealGetTotalByServerZoneIdAndGameId,
 	KdsGetAllSealAccount,
 	KdsAddSealAccount,
 	KdsUpdateSealAccount,
 	KdsDelSealAccount,
-	kdsGetPlacardById,
 	
-	XyjGetTotalByServerZoneIdAndGameId,
-
 	XyjUpdateServer,
 
+	XyjGrayGetTotalByServerZoneIdAndGameId,
 	XyjGetAllGrayAccount,
 	XyjSaveGrayAccount,
 	XyjUpdateGrayAccount,
 	XyjDelGrayAccountById,
 	XyjGetGrayAccountById,
 
+	XyjPlacardGetTotalByServerZoneIdAndGameId,
 	XyjGetAllPlacards,
 	XyjSavePlacard,
 	XyjUpdatePlacards,
 	XyjDelPlacardById,
 	XyjGetPlacardById,
 	
+	XyjEmailGetTotalByServerZoneIdAndGameId,
 	XyjGetAllEmails,
 	XyjAddEmail,
 	XyjUpdateEmail,
 	XyjDelEmailById,
 	XyjGetEmailById,
 	
+	XyjGagGetTotalByServerZoneIdAndGameId,
 	XyjGetAllGagAccount,
 	XyjAddGagAccount,
 	XyjUpdateGagAccount,
 	XyjDelGagAccountById,
 	
+	XyjSealGetTotalByServerZoneIdAndGameId,
 	XyjGetAllSealAccount,
 	XyjAddSealAccount,
 	XyjUpdateSealAccount,
