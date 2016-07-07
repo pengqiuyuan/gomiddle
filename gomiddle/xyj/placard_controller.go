@@ -26,7 +26,7 @@ type PlacardEntity struct {
 
 func PlacardHandler() {
 	http.HandleFunc("/xyjserver/placard/getAllPlacards", GetAllPlacards)
-	http.HandleFunc("/xyjserver/getTotalByServerZoneIdAndGameId", GetTotalByServerZoneIdAndGameId)
+	http.HandleFunc("/xyjserver/placard/getTotalByServerZoneIdAndGameId", TcpProtoIDXyjPlacardGetTotalByServerZoneIdAndGameId)
 	http.HandleFunc("/xyjserver/placard/addPlacards", SavePlacard)
 	http.HandleFunc("/xyjserver/placard/updatePlacards", UpdatePlacards)
 	http.HandleFunc("/xyjserver/placard/delPlacardById", DelPlacardById)
@@ -105,7 +105,7 @@ func GetAllPlacards(w http.ResponseWriter, r *http.Request) {
  * 查询运营大区、游戏下 公告的总数
  * 参数 localhost:8899/xyjserver/getTotalByServerZoneIdAndGameId?serverZoneId=1&gameId=1&category=placard&serverId=xyj_server_1
  */
-func GetTotalByServerZoneIdAndGameId(w http.ResponseWriter, r *http.Request) {
+func TcpProtoIDXyjPlacardGetTotalByServerZoneIdAndGameId(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		serverZoneId := r.FormValue("serverZoneId")
 		gameId := r.FormValue("gameId")
@@ -119,16 +119,16 @@ func GetTotalByServerZoneIdAndGameId(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
 			
 			connid, _ := gomiddle.ConnMa[serverId]
-			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDXyjGetTotalByServerZoneIdAndGameId))	
+			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDXyjPlacardGetTotalByServerZoneIdAndGameId))	
 
 			select {
 			case x := <-gomiddle.Channel_c:
-				fmt.Println(serverId, "  存在,客户端有返回值  GetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDXyjGetTotalByServerZoneIdAndGameId)
-				res = x[string(connid)+"_"+string(proto.TcpProtoIDXyjGetTotalByServerZoneIdAndGameId)]
+				fmt.Println(serverId, "  存在,客户端有返回值  TcpProtoIDXyjPlacardGetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDXyjPlacardGetTotalByServerZoneIdAndGameId)
+				res = x[string(connid)+"_"+string(proto.TcpProtoIDXyjPlacardGetTotalByServerZoneIdAndGameId)]
 				bw := []byte(res)
 			    w.Write(bw)
 			case <-time.After(time.Second * 1):
-				fmt.Println(serverId, "  存在,超时客户端无返回值  GetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDXyjGetTotalByServerZoneIdAndGameId)
+				fmt.Println(serverId, "  存在,超时客户端无返回值  TcpProtoIDXyjPlacardGetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDXyjPlacardGetTotalByServerZoneIdAndGameId)
 				res = `{"num":0}`
 				bw := []byte(res)
 				w.Write(bw)

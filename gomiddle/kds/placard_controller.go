@@ -26,7 +26,7 @@ type PlacardEntity struct {
 
 func PlacardHandler() {
 	http.HandleFunc("/kdsserver/placard/getAllPlacards", GetAllPlacards)
-	http.HandleFunc("/kdsserver/getTotalByServerZoneIdAndGameId", GetTotalByServerZoneIdAndGameId)
+	http.HandleFunc("/kdsserver/placard/getTotalByServerZoneIdAndGameId", TcpProtoIDKdsPlacardGetTotalByServerZoneIdAndGameId)
 	http.HandleFunc("/kdsserver/placard/addPlacards", SavePlacard)
 	http.HandleFunc("/kdsserver/placard/updatePlacards", UpdatePlacards)
 	http.HandleFunc("/kdsserver/placard/delPlacardById", DelPlacardById)
@@ -105,7 +105,7 @@ func GetAllPlacards(w http.ResponseWriter, r *http.Request) {
  * 查询运营大区、游戏下 公告的总数
  * 参数 localhost:8899/kdsserver/getTotalByServerZoneIdAndGameId?serverZoneId=1&gameId=1&category=placard&serverId=kds_server_1
  */
-func GetTotalByServerZoneIdAndGameId(w http.ResponseWriter, r *http.Request) {
+func TcpProtoIDKdsPlacardGetTotalByServerZoneIdAndGameId(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		serverZoneId := r.FormValue("serverZoneId")
 		gameId := r.FormValue("gameId")
@@ -119,16 +119,16 @@ func GetTotalByServerZoneIdAndGameId(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
 			
 			connid, _ := gomiddle.ConnMa[serverId]
-			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDKdsGetTotalByServerZoneIdAndGameId))	
+			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDKdsPlacardGetTotalByServerZoneIdAndGameId))	
 
 			select {
 			case x := <-gomiddle.Channel_c:
-				fmt.Println(serverId, "  存在,客户端有返回值  GetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDKdsGetTotalByServerZoneIdAndGameId)
-				res = x[string(connid)+"_"+string(proto.TcpProtoIDKdsGetTotalByServerZoneIdAndGameId)]
+				fmt.Println(serverId, "  存在,客户端有返回值  TcpProtoIDKdsPlacardGetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDKdsPlacardGetTotalByServerZoneIdAndGameId)
+				res = x[string(connid)+"_"+string(proto.TcpProtoIDKdsPlacardGetTotalByServerZoneIdAndGameId)]
 				bw := []byte(res)
 			    w.Write(bw)
 			case <-time.After(time.Second * 1):
-				fmt.Println(serverId, "  存在,超时客户端无返回值  GetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDKdsGetTotalByServerZoneIdAndGameId)
+				fmt.Println(serverId, "  存在,超时客户端无返回值  TcpProtoIDKdsPlacardGetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDKdsPlacardGetTotalByServerZoneIdAndGameId)
 				res = `{"num":0}`
 				bw := []byte(res)
 				w.Write(bw)
@@ -153,16 +153,16 @@ func GetPlacardById(w http.ResponseWriter, r *http.Request){
 		if exists {
 			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
 			connid, _ := gomiddle.ConnMa[serverId]
-			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDkdsGetPlacardById))	
+			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDKdsGetPlacardById))	
 
 			select {
 			case x := <-gomiddle.Channel_c:
-				fmt.Println(serverId, "  存在,客户端有返回值  GetPlacardById ",proto.TcpProtoIDkdsGetPlacardById)
-				res = x[string(connid)+"_"+string(proto.TcpProtoIDkdsGetPlacardById)]
+				fmt.Println(serverId, "  存在,客户端有返回值  GetPlacardById ",proto.TcpProtoIDKdsGetPlacardById)
+				res = x[string(connid)+"_"+string(proto.TcpProtoIDKdsGetPlacardById)]
 				bw := []byte(res)
 				w.Write(bw)
 			case <-time.After(time.Second * 1):
-				fmt.Println(serverId, "  存在,超时客户端无返回值  GetPlacardById ",proto.TcpProtoIDkdsGetPlacardById)
+				fmt.Println(serverId, "  存在,超时客户端无返回值  GetPlacardById ",proto.TcpProtoIDKdsGetPlacardById)
 				res = `{}`
 				bw := []byte(res)
 				w.Write(bw)
