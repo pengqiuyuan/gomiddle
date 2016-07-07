@@ -112,7 +112,7 @@ func clientHandleMessage(id uint32, b []byte) {
 
 
 	if m.Proto == proto.TcpProtoIDXyjGetAllGagAccount {
-		str := `[{"id":1,"serverZoneId":"1","gameId":"1","serverId":"xyj_server_1","guid":"111","name":"adc","account":"1","platForm":"1","gagTime":"1234","gagStart":"2014-12-11 16:55:15","gagEnd":"2014-12-11 16:55:15"}]`
+		str := `[{"id":1,"serverZoneId":"1","gameId":"1","serverId":"xyj_server_test","guid":"111","name":"adc","account":"1","platForm":"1","gagTime":"1234","gagStart":"2014-12-11 16:55:15","gagEnd":"2014-12-11 16:55:15"}]`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDXyjAddGagAccount {

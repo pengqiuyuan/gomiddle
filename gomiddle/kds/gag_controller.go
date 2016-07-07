@@ -79,8 +79,8 @@ func DelGagAccountById(w http.ResponseWriter, r *http.Request){
 		serverZoneId := r.FormValue("serverZoneId")
 		gameId := r.FormValue("gameId")
 		serverId := r.FormValue("serverId")
-		id := r.FormValue("id")
-		JsonStr := `{"serverZoneId":"` + serverZoneId + `","gameId":"` + gameId + `","serverId":"` + serverId + `","id":"` + id + `"}`
+		guid := r.FormValue("guid")
+		JsonStr := `{"serverZoneId":"` + serverZoneId + `","gameId":"` + gameId + `","serverId":"` + serverId + `","guid":"` + guid + `"}`
 		conn, exists := gomiddle.ConnMap[serverId]
 		var res string
 		if exists {

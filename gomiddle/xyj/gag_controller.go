@@ -79,8 +79,8 @@ func DelGagAccountById(w http.ResponseWriter, r *http.Request){
 		serverZoneId := r.FormValue("serverZoneId")
 		gameId := r.FormValue("gameId")
 		serverId := r.FormValue("serverId")
-		id := r.FormValue("id")
-		JsonStr := `{"serverZoneId":"` + serverZoneId + `","gameId":"` + gameId + `","serverId":"` + serverId + `","id":"` + id + `"}`
+		guid := r.FormValue("guid")
+		JsonStr := `{"serverZoneId":"` + serverZoneId + `","gameId":"` + gameId + `","serverId":"` + serverId + `","guid":"` + guid + `"}`
 		conn, exists := gomiddle.ConnMap[serverId]
 		var res string
 		if exists {
@@ -118,6 +118,7 @@ func AddOrUpdateGag(m uint16, w http.ResponseWriter, r *http.Request) {
 		json.Unmarshal([]byte(result), &s)
 		ser := s.ServerId
 		//判断serverid是否在ConnMap里
+		fmt.Println("22222  "  + string(result))
 		conn, exists := gomiddle.ConnMap[ser]
 		var res string
 		if exists {
