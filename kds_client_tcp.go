@@ -60,13 +60,17 @@ func clientHandleMessage(id uint32, b []byte) {
 		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
-	}
+	} else if m.Proto == proto.TcpProtoIDKdsGrayGetTotalByServerZoneIdAndGameId {
+		str := `{"num":1}`
+		m := makeNoticeMsg(str, m.Proto)
+		c.Send(m)
+	} 
 
 	if m.Proto == proto.TcpProtoIDKdsSavePlacard {
 		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
-	} else if m.Proto == proto.TcpProtoIDKdsGetTotalByServerZoneIdAndGameId {
+	} else if m.Proto == proto.TcpProtoIDKdsPlacardGetTotalByServerZoneIdAndGameId {
 		str := `{"num":1}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
@@ -108,6 +112,10 @@ func clientHandleMessage(id uint32, b []byte) {
 		str := `{"id":1,"serverZoneId":"1","gameId":"1","serverId":"kds_server_1","sender":"1","title":"1","contents":"1","annex":[{"itemId":"1","itemNum":1},{"itemId":"1","itemNum":1},{"itemId":"112","itemNum":11234444}] }`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
+	} else if m.Proto == proto.TcpProtoIDKdsEmailGetTotalByServerZoneIdAndGameId {
+		str := `{"num":1}`
+		m := makeNoticeMsg(str, m.Proto)
+		c.Send(m)
 	}
 
 
@@ -127,7 +135,11 @@ func clientHandleMessage(id uint32, b []byte) {
 		str := `{"message":"success"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
-	} 
+	}  else if m.Proto == proto.TcpProtoIDKdsGagGetTotalByServerZoneIdAndGameId {
+		str := `{"num":1}`
+		m := makeNoticeMsg(str, m.Proto)
+		c.Send(m)
+	}
 	
 	if m.Proto == proto.TcpProtoIDKdsGetAllSealAccount {
 		str := `[{"id":1,"serverZoneId":"1","gameId":"1","serverId":"kds_server_1","guid":"111","name":"adc","account":"1","platForm":"1","sealTime":"1234","sealStart":"2014-12-11 16:55:15","sealEnd":"2014-12-11 16:55:15"}]`
@@ -145,7 +157,11 @@ func clientHandleMessage(id uint32, b []byte) {
 		str := `{"message":"success"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
-	} 
+	}  else if m.Proto == proto.TcpProtoIDKdsSealGetTotalByServerZoneIdAndGameId {
+		str := `{"num":1}`
+		m := makeNoticeMsg(str, m.Proto)
+		c.Send(m)
+	}
 	
 }
 

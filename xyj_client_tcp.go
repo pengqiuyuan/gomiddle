@@ -60,13 +60,17 @@ func clientHandleMessage(id uint32, b []byte) {
 		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
-	}
+	} else if m.Proto == proto.TcpProtoIDXyjGrayGetTotalByServerZoneIdAndGameId {
+		str := `{"num":1}`
+		m := makeNoticeMsg(str, m.Proto)
+		c.Send(m)
+	} 
 
 	if m.Proto == proto.TcpProtoIDXyjSavePlacard {
 		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
-	} else if m.Proto == proto.TcpProtoIDXyjGetTotalByServerZoneIdAndGameId {
+	} else if m.Proto == proto.TcpProtoIDXyjPlacardGetTotalByServerZoneIdAndGameId {
 		str := `{"num":1}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
@@ -108,6 +112,10 @@ func clientHandleMessage(id uint32, b []byte) {
 		str := `{"id":1,"serverZoneId":"1","gameId":"1","serverId":"xyj_server_1","sender":"1","title":"1","contents":"1","annex":[{"itemId":"1","itemNum":1},{"itemId":"1","itemNum":1},{"itemId":"112","itemNum":11234444}] }`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
+	} else if m.Proto == proto.TcpProtoIDXyjEmailGetTotalByServerZoneIdAndGameId {
+		str := `{"num":1}`
+		m := makeNoticeMsg(str, m.Proto)
+		c.Send(m)
 	}
 
 
@@ -125,6 +133,10 @@ func clientHandleMessage(id uint32, b []byte) {
 		c.Send(m)
 	} else if m.Proto == proto.TcpProtoIDXyjDelGagAccountById {
 		str := `{"message":"success"}`
+		m := makeNoticeMsg(str, m.Proto)
+		c.Send(m)
+	} else if m.Proto == proto.TcpProtoIDXyjGagGetTotalByServerZoneIdAndGameId {
+		str := `{"num":1}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
 	} 
@@ -145,7 +157,11 @@ func clientHandleMessage(id uint32, b []byte) {
 		str := `{"message":"success"}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
-	} 
+	}  else if m.Proto == proto.TcpProtoIDXyjSealGetTotalByServerZoneIdAndGameId {
+		str := `{"num":1}`
+		m := makeNoticeMsg(str, m.Proto)
+		c.Send(m)
+	}
 	
 }
 
