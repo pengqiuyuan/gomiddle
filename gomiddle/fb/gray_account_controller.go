@@ -26,6 +26,7 @@ func GrayAccountHandler() {
 	http.HandleFunc("/fbserver/server/updateGrayAccount", UpdateGrayAccount)
 	http.HandleFunc("/fbserver/server/delGrayAccountById", DelGrayAccountById)
 	http.HandleFunc("/fbserver/server/getGrayAccountByAccountId", GetGrayAccountByAccountId)
+	http.HandleFunc("/fbserver/server/getTotalByServerZoneIdAndGameId", TcpProtoIDFbGrayGetTotalByServerZoneIdAndGameId)
 }
 
 func GetAllGrayAccount(w http.ResponseWriter, r *http.Request) {
@@ -190,3 +191,38 @@ func AddOrUpdateGrayAccount(m uint16, w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func TcpProtoIDFbGrayGetTotalByServerZoneIdAndGameId(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		serverZoneId := r.FormValue("serverZoneId")
+		gameId := r.FormValue("gameId")
+		category := r.FormValue("category")
+		serverId := r.FormValue("serverId")
+		JsonStr := `{"serverZoneId":"` + serverZoneId + `","gameId":"` + gameId + `","category":"` + category + `","serverId":"` + serverId + `"}`
+
+		conn, exists := gomiddle.ConnMap[serverId]
+		var res string
+		if exists {
+			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
+			
+			connid, _ := gomiddle.ConnMa[serverId]
+			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDFbGrayGetTotalByServerZoneIdAndGameId))	
+
+			select {
+			case x := <-gomiddle.Channel_c:
+				fmt.Println(serverId, "  存在,客户端有返回值  TcpProtoIDFbGrayGetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDFbGrayGetTotalByServerZoneIdAndGameId)
+				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbGrayGetTotalByServerZoneIdAndGameId)]
+				bw := []byte(res)
+			    w.Write(bw)
+			case <-time.After(time.Second * 1):
+				fmt.Println(serverId, "  存在,超时客户端无返回值  TcpProtoIDFbGrayGetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDFbGrayGetTotalByServerZoneIdAndGameId)
+				res = `{"num":0}`
+				bw := []byte(res)
+				w.Write(bw)
+			}
+		} else {
+			res = `{"num":0}`
+			bw := []byte(res)
+			w.Write(bw)
+		}
+	}
+}
