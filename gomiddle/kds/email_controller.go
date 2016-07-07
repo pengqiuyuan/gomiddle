@@ -34,6 +34,7 @@ func EmailHandler() {
 	http.HandleFunc("/kdsserver/email/updateEmail", UpdateEmail)
 	http.HandleFunc("/kdsserver/email/delEmailById", DelEmailById)
 	http.HandleFunc("/kdsserver/email/getEmailById", GetEmailById)
+	http.HandleFunc("/kdsserver/email/getTotalByServerZoneIdAndGameId", TcpProtoIDKdsEmailGetTotalByServerZoneIdAndGameId)
 }
 
 func GetAllEmails(w http.ResponseWriter, r *http.Request){
@@ -192,5 +193,41 @@ func AddOrUpdateEmail(m uint16, w http.ResponseWriter, r *http.Request) {
 		}
 		b := []byte(res)
 		w.Write(b)
+	}
+}
+
+func TcpProtoIDKdsEmailGetTotalByServerZoneIdAndGameId(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		serverZoneId := r.FormValue("serverZoneId")
+		gameId := r.FormValue("gameId")
+		category := r.FormValue("category")
+		serverId := r.FormValue("serverId")
+		JsonStr := `{"serverZoneId":"` + serverZoneId + `","gameId":"` + gameId + `","category":"` + category + `","serverId":"` + serverId + `"}`
+
+		conn, exists := gomiddle.ConnMap[serverId]
+		var res string
+		if exists {
+			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
+			
+			connid, _ := gomiddle.ConnMa[serverId]
+			conn.Send(connid, makeNoticeMsg(JsonStr,proto.TcpProtoIDKdsEmailGetTotalByServerZoneIdAndGameId))	
+
+			select {
+			case x := <-gomiddle.Channel_c:
+				fmt.Println(serverId, "  存在,客户端有返回值  TcpProtoIDKdsEmailGetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDKdsEmailGetTotalByServerZoneIdAndGameId)
+				res = x[string(connid)+"_"+string(proto.TcpProtoIDKdsEmailGetTotalByServerZoneIdAndGameId)]
+				bw := []byte(res)
+			    w.Write(bw)
+			case <-time.After(time.Second * 1):
+				fmt.Println(serverId, "  存在,超时客户端无返回值  TcpProtoIDKdsEmailGetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDKdsEmailGetTotalByServerZoneIdAndGameId)
+				res = `{"num":0}`
+				bw := []byte(res)
+				w.Write(bw)
+			}
+		} else {
+			res = `{"num":0}`
+			bw := []byte(res)
+			w.Write(bw)
+		}
 	}
 }
