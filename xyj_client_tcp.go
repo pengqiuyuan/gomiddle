@@ -9,7 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"time"
-
+	"fmt"
 	proto "./tutorial/tcp"
 	flatbuffers "github.com/google/flatbuffers/go"
 )
@@ -161,6 +161,12 @@ func clientHandleMessage(id uint32, b []byte) {
 		str := `{"num":3}`
 		m := makeNoticeMsg(str, m.Proto)
 		c.Send(m)
+	}
+	
+	if m.Proto == proto.TcpProtoIDGmStatus {
+		// 从消息payload部分获取正文内容
+		s := proto.GetRootAsNotice(t.Payload, 0)
+		fmt.Println("  测试   ", string(s.Content()))
 	}
 	
 }

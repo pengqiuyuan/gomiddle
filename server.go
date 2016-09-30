@@ -23,6 +23,7 @@ import (
 	kds "./gomiddle/kds"
 	xyj "./gomiddle/xyj"
 	proto "./tutorial/tcp"
+	flatbuffers "github.com/google/flatbuffers/go"
 )
 
 
@@ -42,6 +43,33 @@ var (
 	cnt        int                       = 0
 	db *sql.DB
 )
+
+func makeNoticeMsg(str string, p uint16) []byte {
+	t := transport.TcpMessage{}
+
+	builder := flatbuffers.NewBuilder(0)
+
+	ct := builder.CreateString(str)
+	proto.NoticeStart(builder)
+	proto.NoticeAddContent(builder, ct)
+	payload := proto.NoticeEnd(builder)
+
+	builder.Finish(payload)
+
+	t.Payload = builder.Bytes[builder.Head():]
+
+	// 填充协议头信息
+	t.Header.Proto = p
+	t.Header.Flag = 0xdcba
+	t.Header.Size = uint16(len(t.Payload))
+
+	ret, err := t.Pack()
+	if err != nil {
+		log.Fatal(err.Error())
+		return nil
+	}
+	return ret
+}
 
 func shutdown() {
 	wg.Done()
@@ -84,6 +112,83 @@ func handleMessage(id uint32, b []byte) {
 				hql.Insert_all_platform(db, zoneId, gameId, jsonServer.PlatForm[i], jsonServer.ServerId, sip[0], sip[1])
 			}
 			hql.Select_all_server(db,zoneId, gameId, jsonServer.ServerId, sip[0], sip[1], jsonServer.Status)
+			
+			/**
+			{
+				"id":"1000",
+		        "serverZoneId":"1",
+		        "gameId":"4",
+		        "eventType":"1",
+		        "mailUiPosition":"-1",
+		        "eventPic":"huodong_icon_tongyong.png",
+		        "activeType":"0",
+		        "activeData":"2016-07-08 23:59:59",
+		        "roleLevel":"1_100",
+		        "times":"-1",
+		        "activeDelay":"0",
+		        "activeDay":"0",
+		        "eventRepeatInterval":"0",
+		        "eventName":"首冲超级大礼包",
+		        "eventTitle":"首冲超级大礼包",
+		        "eventDes":"首冲超级大礼包啦啦啦啦",
+		        "eventIcon":"cz_sp_jiaobiao1.png",
+		        "listPriority":"0",
+		        "doneHiding":"0",
+		        "followingEvent":"0",
+		        "eventDataPrototype":[{
+		            "group":"1",
+		            "eventDataName":"活动大礼",
+		            "vipPremiss":"1_100",
+		            "eventDataTimes":"-1",
+		            "eventDataDelay":"0",
+		            "eventDataDes":"活动条目描述",
+		            "eventCondition":"1",
+		            "eventConditionType":"1",
+		            "conditionValue1":"1",
+		            "conditionValue2":"1",
+		            "eventRewards":"1_2_3",
+		            "eventRewardsNum":"100_100_100",
+		        }]
+		    }
+			*/
+			fmt.Println("活动初始化..")
+			str1 := `[{
+						"id":"1000",
+				        "serverZoneId":"1",
+				        "gameId":"4",
+				        "eventType":"1",
+				        "mailUiPosition":"-1",
+				        "eventPic":"huodong_icon_tongyong.png",
+				        "activeType":"0",
+				        "activeData":"2016-07-08 23:59:59",
+				        "roleLevel":"1_100",
+				        "times":"-1",
+				        "activeDelay":"0",
+				        "activeDay":"0",
+				        "eventRepeatInterval":"0",
+				        "eventName":"首冲超级大礼包",
+				        "eventTitle":"首冲超级大礼包",
+				        "eventDes":"首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦",
+				        "eventIcon":"cz_sp_jiaobiao1.png",
+				        "listPriority":"0",
+				        "doneHiding":"0",
+				        "followingEvent":"0",
+				        "eventDataPrototype":[{
+				            "group":"1",
+				            "eventDataName":"活动大礼",
+				            "vipPremiss":"1_100",
+				            "eventDataTimes":"-1",
+				            "eventDataDelay":"0",
+				            "eventDataDes":"活动条目描述首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦首冲超级大礼包啦啦啦啦",
+				            "eventCondition":"1",
+				            "eventConditionType":"1",
+				            "conditionValue1":"1",
+				            "conditionValue2":"1",
+				            "eventRewards":"1_2_3",
+				            "eventRewardsNum":"100_100_100",
+				        }]
+				    }]`
+			a.Send(id, makeNoticeMsg(str1,proto.TcpProtoIDGmStatus))				
 		}else{
 			fmt.Println(err)
 		}
