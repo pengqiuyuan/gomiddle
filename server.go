@@ -90,6 +90,8 @@ func handleMessage(id uint32, b []byte) {
 	}
 
 	m := t.Header
+	fmt.Println("m := t.Header  -----------------------")
+	fmt.Println(m);
 	//唯一游戏服务器发送的消息，服务器状态路由 TcpProtoIDStatus
 	if m.Proto == proto.TcpProtoIDGmStatus {
 		// 从消息payload部分获取正文内容
@@ -312,4 +314,5 @@ func XyjHandle(){
 	xyj.GagHandler()
 	xyj.SealHandler()
 	xyj.EmailHandler()
+	xyj.EventHandler()
 }

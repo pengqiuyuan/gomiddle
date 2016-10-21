@@ -98,4 +98,9 @@ const (
 	TcpProtoIDXyjAddSealAccount = 92
 	TcpProtoIDXyjUpdateSealAccount = 93
 	TcpProtoIDXyjDelSealAccount = 94
+	TcpProtoIDXyjAddEventPrototype = 95
+	TcpProtoIDXyjUpdateEventPrototype = 96
+	TcpProtoIDXyjAddEventDataPrototype = 97
+	TcpProtoIDXyjUpdateEventDataPrototype = 98
+	TcpProtoIDXyjCloseEventPrototype = 99
 )

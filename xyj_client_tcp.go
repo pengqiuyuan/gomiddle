@@ -163,7 +163,54 @@ func clientHandleMessage(id uint32, b []byte) {
 		c.Send(m)
 	}
 	
-	if m.Proto == proto.TcpProtoIDGmStatus {
+	if m.Proto == proto.TcpProtoIDXyjAddEventPrototype {
+		
+		// 从消息payload部分获取正文内容
+		s := proto.GetRootAsNotice(t.Payload, 0)
+		fmt.Println("  测试1111   ", string(s.Content()))
+		
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
+		m := makeNoticeMsg(str, m.Proto)
+		c.Send(m)
+	} else if m.Proto == proto.TcpProtoIDXyjUpdateEventPrototype {
+				
+		// 从消息payload部分获取正文内容
+		s := proto.GetRootAsNotice(t.Payload, 0)
+		fmt.Println("  测试2222   ", string(s.Content()))
+	
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
+		m := makeNoticeMsg(str, m.Proto)
+		c.Send(m)
+	} else if m.Proto == proto.TcpProtoIDXyjAddEventDataPrototype {
+				
+		// 从消息payload部分获取正文内容
+		s := proto.GetRootAsNotice(t.Payload, 0)
+		fmt.Println("  测试3333   ", string(s.Content()))
+	
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
+		m := makeNoticeMsg(str, m.Proto)
+		c.Send(m)
+	} else if m.Proto == proto.TcpProtoIDXyjUpdateEventDataPrototype {
+				
+		// 从消息payload部分获取正文内容
+		s := proto.GetRootAsNotice(t.Payload, 0)
+		fmt.Println("  测试4444   ", string(s.Content()))
+	
+		str := `{"choose":"1","success":"1","objFail":[],"fail":"0"}`
+		m := makeNoticeMsg(str, m.Proto)
+		c.Send(m)
+	} else if m.Proto == proto.TcpProtoIDXyjCloseEventPrototype {
+				
+		// 从消息payload部分获取正文内容
+		s := proto.GetRootAsNotice(t.Payload, 0)
+		fmt.Println("  测试5555   ", string(s.Content()))
+	
+		str := `{"message":"success"}`
+		m := makeNoticeMsg(str, m.Proto)
+		c.Send(m)
+	} 
+	
+	if m.Proto == proto.TcpProtoIDGmStatus { //获取 gomiddle 返回的活动列表
 		// 从消息payload部分获取正文内容
 		s := proto.GetRootAsNotice(t.Payload, 0)
 		fmt.Println("  测试   ", string(s.Content()))

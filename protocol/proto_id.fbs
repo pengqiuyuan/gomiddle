@@ -114,7 +114,13 @@ enum TcpProtoID : ushort {
 	XyjGetAllSealAccount,
 	XyjAddSealAccount,
 	XyjUpdateSealAccount,
-	XyjDelSealAccount
+	XyjDelSealAccount,
+	
+	XyjAddEventPrototype,
+	XyjUpdateEventPrototype,
+	XyjAddEventDataPrototype,
+	XyjUpdateEventDataPrototype,
+	XyjCloseEventPrototype
 }
 
 
