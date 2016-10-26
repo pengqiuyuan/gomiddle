@@ -26,8 +26,6 @@ import (
 	flatbuffers "github.com/google/flatbuffers/go"
 )
 
-
-
 type ServerInfoJson struct {
 	ServerZoneId string   `json:"serverZoneId"`
 	PlatForm     []string `json:"platForm"`
@@ -115,13 +113,29 @@ func handleMessage(id uint32, b []byte) {
 			}
 			hql.Select_all_server(db,zoneId, gameId, jsonServer.ServerId, sip[0], sip[1], jsonServer.Status)
 			
-			str1, err := hql.GetEventJSON(db,zoneId, gameId)
-			if err != nil {  
-		        fmt.Printf(err.Error())
+			str1, err1 := hql.GetEventJSON(db,zoneId, gameId)
+			if err1 != nil {  
+		        fmt.Printf(err1.Error())
 		    }  
-			str1 = `{"eventPrototype":`+str1+`}`
-			fmt.Println("活动初始化..   "  + str1)
-			a.Send(id, makeNoticeMsg(str1,proto.TcpProtoIDGmStatus))				
+			
+			var event []xyj.EventPrototype
+			err2 := json.Unmarshal([]byte(str1), &event)
+			if err2 != nil {
+				fmt.Printf(err2.Error())
+			}
+
+			fmt.Println("------------------------------------------------------------------------------------>活动初始化..分包发送开始  ",jsonServer.ServerId)
+			for i, key := range event {
+				str2,err3 := hql.GetEventDataJSON(db,key.Id)
+				if err3 != nil {
+					fmt.Printf(err3.Error())
+				}
+				jsonData,_ := json.Marshal(key)  
+				e :=  `{"eventPrototype":`+string(jsonData)+`,"eventDataPrototype":`+str2+`}`
+				fmt.Println("-->活动初始化..分包发送第 ",i," 条活动：",e)
+				a.Send(id, makeNoticeMsg(str1,proto.TcpProtoIDGmStatus))	
+			}			
+			fmt.Println("------------------------------------------------------------------------------------>活动初始化..分包发送结束  ",jsonServer.ServerId)
 		}else{
 			fmt.Println(err)
 		}

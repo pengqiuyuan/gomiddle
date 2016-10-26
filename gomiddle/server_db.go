@@ -209,7 +209,7 @@ func Insert_all_platform(db *sql.DB,serverZoneId int,gameId int,platFormId strin
 }
 
 func GetEventJSON(db *sql.DB,serverZoneId int,gameId int) (string, error) {  
-    stmt, err := db.Prepare("SELECT * from game_gm_event_prototype  WHERE game_id = ? and server_zone_id = ?")  
+    stmt, err := db.Prepare("SELECT CAST(id AS CHAR) id,server_zone_id serverZoneId,game_id gameId,event_type eventType,main_ui_position mainUiPosition,event_pic eventPic,active_type activeType,active_data activeData,role_level_min roleLevelMin,role_level_max roleLevelMax,times times,active_delay activeDelay,active_day activeDay,event_repeat_interval eventRepeatInterval,event_name eventName,event_title eventTitle,event_des eventDes,event_icon eventIcon,list_priority listPriority,done_hiding doneHiding,following_event followingEvent,event_show eventShow  from game_gm_event_prototype  WHERE game_id = ? and server_zone_id = ?")  
     if err != nil {  
         return "", err  
     }  
@@ -239,10 +239,56 @@ func GetEventJSON(db *sql.DB,serverZoneId int,gameId int) (string, error) {
           b, ok := val.([]byte)  
           if ok {  
               v = string(b)  
-          } else {  
+          } else {   
               v = val  
           }  
-          entry[col] = v  
+          entry[col] = v
+      }  
+      tableData = append(tableData, entry)  
+    }  
+    jsonData, err := json.Marshal(tableData)  
+    if err != nil {  
+      return "", err  
+    }  
+    //fmt.Println(string(jsonData))  
+    return string(jsonData), nil   
+}  
+
+func GetEventDataJSON(db *sql.DB,eventId string) (string, error) {  
+    stmt, err := db.Prepare("SELECT CAST(event_data_id AS CHAR) eventDataId,CAST(event_id AS CHAR) eventId,event_group eventGroup,event_data_name eventDataName,vip_min vipMin,vip_max vipMax,event_data_times eventDataTimes,event_data_delay eventDataDelay,event_data_des eventDataDes,event_condition eventCondition,event_condition_type eventConditionType,condition_value1 conditionValue1,condition_value2 conditionValue2,event_rewards eventRewards,event_rewards_num eventRewardsNum from game_gm_event_data_prototype  WHERE event_id = ?")  
+    if err != nil {  
+        return "", err  
+    }  
+    defer stmt.Close()  
+    rows, err := stmt.Query(eventId)  
+    if err != nil {  
+        return "", err  
+    }  
+    defer rows.Close()  
+    columns, err := rows.Columns()  
+    if err != nil {  
+      return "", err  
+    }  
+    count := len(columns)  
+    tableData := make([]map[string]interface{}, 0)  
+    values := make([]interface{}, count)  
+    valuePtrs := make([]interface{}, count)  
+    for rows.Next() {  
+      for i := 0; i < count; i++ {  
+          valuePtrs[i] = &values[i]  
+      }  
+      rows.Scan(valuePtrs...)  
+      entry := make(map[string]interface{})  
+      for i, col := range columns {  
+          var v interface{}  
+          val := values[i]  
+          b, ok := val.([]byte)  
+          if ok {  
+              v = string(b)  
+          } else {   
+              v = val  
+          }  
+          entry[col] = v
       }  
       tableData = append(tableData, entry)  
     }  
