@@ -4,6 +4,7 @@ import (
     "fmt"
     "database/sql"
     "log"
+	"encoding/json"
 )
 
 
@@ -206,3 +207,49 @@ func Insert_all_platform(db *sql.DB,serverZoneId int,gameId int,platFormId strin
     stmt.Exec(serverZoneId,gameId,platFormId,serverId,ip,port)
     err = tx.Commit()
 }
+
+func GetEventJSON(db *sql.DB,serverZoneId int,gameId int) (string, error) {  
+    stmt, err := db.Prepare("SELECT * from game_gm_event_prototype  WHERE game_id = ? and server_zone_id = ?")  
+    if err != nil {  
+        return "", err  
+    }  
+    defer stmt.Close()  
+    rows, err := stmt.Query(gameId,serverZoneId)  
+    if err != nil {  
+        return "", err  
+    }  
+    defer rows.Close()  
+    columns, err := rows.Columns()  
+    if err != nil {  
+      return "", err  
+    }  
+    count := len(columns)  
+    tableData := make([]map[string]interface{}, 0)  
+    values := make([]interface{}, count)  
+    valuePtrs := make([]interface{}, count)  
+    for rows.Next() {  
+      for i := 0; i < count; i++ {  
+          valuePtrs[i] = &values[i]  
+      }  
+      rows.Scan(valuePtrs...)  
+      entry := make(map[string]interface{})  
+      for i, col := range columns {  
+          var v interface{}  
+          val := values[i]  
+          b, ok := val.([]byte)  
+          if ok {  
+              v = string(b)  
+          } else {  
+              v = val  
+          }  
+          entry[col] = v  
+      }  
+      tableData = append(tableData, entry)  
+    }  
+    jsonData, err := json.Marshal(tableData)  
+    if err != nil {  
+      return "", err  
+    }  
+    //fmt.Println(string(jsonData))  
+    return string(jsonData), nil   
+}  

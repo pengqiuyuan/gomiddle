@@ -97,6 +97,7 @@ func UpdateEventDataPrototype(w http.ResponseWriter, r *http.Request){
 
 /*新增、修改活动*/
 func AddOrUpdateEventPrototype(m uint16, w http.ResponseWriter, r *http.Request) {
+	fmt.Println(" ---------------------------- 开始-----------------------------")
 	if r.Method == "POST" {
 		r.ParseForm()
 		result, _ := ioutil.ReadAll(r.Body)
@@ -129,6 +130,9 @@ func AddOrUpdateEventPrototype(m uint16, w http.ResponseWriter, r *http.Request)
 							objF = responseList.ObjFail[0]
 						}
 						res = `{"choose":"` + responseList.Choose + `","success":"` + responseList.Success + `","objFail":"` + objF + `","fail":"` + responseList.Fail + `"}`
+					}else{
+						fmt.Println(err," 存在,客户端有返回值  AddOrUpdate 新增、修改活动，出错了")
+						res = `{"choose":"1","success":"0","objFail":"` + key + `","fail":"1"}`
 					}
 					
 				case <-time.After(time.Second * 1):
@@ -143,15 +147,16 @@ func AddOrUpdateEventPrototype(m uint16, w http.ResponseWriter, r *http.Request)
 		}
 		b := []byte(res)
 		w.Write(b)
+		fmt.Println(" ---------------------------- 结束-----------------------------")
 	}
 }
 
 /*新增、修改活动下得条目*/
 func AddOrUpdateEventDataPrototype(m uint16, w http.ResponseWriter, r *http.Request) {
+	fmt.Println(" ---------------------------- 开始-------------------------------------------------------------")
 	if r.Method == "POST" {
 		r.ParseForm()
 		result, _ := ioutil.ReadAll(r.Body)
-		fmt.Println(string(result),"    新增、修改活动下得条目")
 		r.Body.Close()
 		//结构已知，解析到结构体
 		var s EventDataPrototype
@@ -181,6 +186,9 @@ func AddOrUpdateEventDataPrototype(m uint16, w http.ResponseWriter, r *http.Requ
 							objF = responseList.ObjFail[0]
 						}
 						res = `{"choose":"` + responseList.Choose + `","success":"` + responseList.Success + `","objFail":"` + objF + `","fail":"` + responseList.Fail + `"}`
+					}else{
+						fmt.Println(err," 存在,客户端有返回值  AddOrUpdate 新增、修改活动下得条目，出错了")
+						res = `{"choose":"1","success":"0","objFail":"` + key + `","fail":"1"}`
 					}
 					
 				case <-time.After(time.Second * 1):
@@ -195,6 +203,7 @@ func AddOrUpdateEventDataPrototype(m uint16, w http.ResponseWriter, r *http.Requ
 		}
 		b := []byte(res)
 		w.Write(b)
+		fmt.Println(" ---------------------------- 结束-------------------------------------------------------------")
 	}
 }
 
