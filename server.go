@@ -131,9 +131,9 @@ func handleMessage(id uint32, b []byte) {
 					fmt.Printf(err3.Error())
 				}
 				jsonData,_ := json.Marshal(key)  
-				e :=  `{"eventPrototype":`+string(jsonData)+`,"eventDataPrototype":`+str2+`}`
+				e :=  `{"eventPrototype":[`+string(jsonData)+`],"eventDataPrototype":`+str2+`}`
 				fmt.Println("-->活动初始化..分包发送第 ",i," 条活动：",e)
-				a.Send(id, makeNoticeMsg(str1,proto.TcpProtoIDGmStatus))	
+				a.Send(id, makeNoticeMsg(e,proto.TcpProtoIDGmStatus))	
 			}			
 			fmt.Println("------------------------------------------------------------------------------------>活动初始化..分包发送结束  ",jsonServer.ServerId)
 		}else{

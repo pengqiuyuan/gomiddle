@@ -13,33 +13,33 @@ import (
 )
 
 type EventPrototype struct{
-	Id string 
-	ServerZoneId string
-	GameId string
-	ServerId string
-	EventType string   
-	ActiveType string 
-	ActiveData string  
-	ActiveDay string   
+	Id string `json:"id"`
+	ServerZoneId string `json:"serverZoneId"`
+	GameId string `json:"gameId"`
+	ServerId string  `json:"serverId"`
+	EventType string    `json:"eventType"`
+	ActiveType string `json:"activeType"`
+	ActiveData string  `json:"activeData"`
+	ActiveDay string   `json:"activeDay"`
 
-	ActiveDelay string   
-	Times string 
-	EventRepeatInterval string  
-	FollowingEvent string   
+	ActiveDelay string   `json:"activeDelay"`
+	Times string `json:"times"`
+	EventRepeatInterval string  `json:"eventRepeatInterval"`
+	FollowingEvent string   `json:"followingEvent"`
 	
-	RoleLevelMin string   
-	RoleLevelMax string 
-	MainUiPosition string  
-	EventTitle string   
+	RoleLevelMin string   `json:"roleLevelMin"`
+	RoleLevelMax string `json:"roleLevelMax"`
+	MainUiPosition string  `json:"mainUiPosition"`
+	EventTitle string   `json:"eventTitle"`
 	
-	EventName string   
-	EventDes string 
-	EventPic string  
-	EventIcon string   
+	EventName string   `json:"eventName"`
+	EventDes string `json:"eventDes"`
+	EventPic string  `json:"eventPic"`
+	EventIcon string   `json:"eventIcon"`
 	
-	ListPriority string   
-	DoneHiding string 
-	EventShow string  
+	ListPriority string   `json:"listPriority"`
+	DoneHiding string `json:"doneHiding"`
+	EventShow string  `json:"eventShow"`
 }
 
 type EventDataPrototype struct{
