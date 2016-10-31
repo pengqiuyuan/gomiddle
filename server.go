@@ -180,7 +180,7 @@ func init() {
 
 func main() {
 	var err error
-	db, err = sql.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/game_server?charset=utf8")
+	db, err = sql.Open("mysql", "root:123456@tcp(db:3306)/game_server?charset=utf8")
 	db.SetMaxOpenConns(50)
     db.SetMaxIdleConns(50)
 	defer db.Close()
