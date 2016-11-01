@@ -152,6 +152,11 @@ func handleMessage(id uint32, b []byte) {
 
 func handleDisconnect(id uint32) {
 	log.Println("disconnect id: ", id)
+	sip := strings.Split(a.RemoteAddr(id), ":")
+	//mysql删除对应保存的客户端信息
+	hql.Delete_server(db, sip[0], sip[1])
+	hql.Delete_platform(db, sip[0], sip[1])
+	
 	delete(hql.ConnMap, hql.ConnM[id])
 	delete(hql.ConnMa, hql.ConnM[id])
 	delete(hql.ConnM, id)
@@ -162,10 +167,7 @@ func handleDisconnect(id uint32) {
 			delete(hql.ResponseMap, key)
 		}
 	}
-	sip := strings.Split(a.RemoteAddr(id), ":")
-	//mysql删除对应保存的客户端信息
-	hql.Delete_server(db, sip[0], sip[1])
-	hql.Delete_platform(db, sip[0], sip[1])
+
 }
 
 func init() {
