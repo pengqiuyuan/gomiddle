@@ -261,7 +261,7 @@ func client() *tcp.Connector {
 	p.BodySizeOffset = 21
 	p.BodySizeLen = 2
 	p.NotifyWithHead = true
-	c := tcp.NewConnector(id, "182.92.69.21:8888", p)
+	c := tcp.NewConnector(id, "127.0.0.1:8888", p)
 	c.HandleMessage(clientHandleMessage)
 	c.HandleConnect(handleConnect)
 	c.HandleDisconnect(handleDisconnect)

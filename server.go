@@ -78,6 +78,12 @@ func handleConnect(id uint32) {
 }
 
 func handleMessage(id uint32, b []byte) {
+	defer func() { //必须要先声明defer，否则不能捕获到panic异常
+        if err := recover(); err != nil {
+			fmt.Println("TcpProtoIDGmStatus 号协议，未知异常捕获")
+            fmt.Println(err) //这里的err其实就是panic传入的内容，"bug"
+        }
+    }()
 	log.Println("on message: ", b)
 	t := transport.TcpMessage{}
 
@@ -95,11 +101,17 @@ func handleMessage(id uint32, b []byte) {
 		// 从消息payload部分获取正文内容
 		s := proto.GetRootAsNotice(t.Payload, 0)
 		var jsonServer ServerInfoJson
+		//如果JSON中的字段在go的目标类型中不存在，json.Unmarshal()在解码时会丢弃该字段
 		if err := json.Unmarshal(s.Content(), &jsonServer); err == nil {
 			zoneIdCvt,_ := strconv.ParseInt(jsonServer.ServerZoneId, 10, 32)
 			gameIdCvt,_ := strconv.ParseInt(jsonServer.GameId, 10, 32)
 			zoneId := int(zoneIdCvt)
 			gameId := int(gameIdCvt)
+			
+			if(zoneId == 0 && gameId == 0){
+				fmt.Println("TcpProtoIDGmStatus 号协议收到了非服务器状态的 json 字符串，return",zoneId,gameId)
+				return
+			}
 			// 新连接加入map
 			hql.ConnMap[jsonServer.ServerId] = a
 			hql.ConnMa[jsonServer.ServerId] = id
@@ -137,7 +149,7 @@ func handleMessage(id uint32, b []byte) {
 			}			
 			fmt.Println("------------------------------------------------------------------------------------>活动初始化..分包发送结束  ",jsonServer.ServerId)
 		}else{
-			fmt.Println(err)
+			fmt.Println("111111",err)
 		}
 	} else {
 		// 从消息payload部分获取正文内容
