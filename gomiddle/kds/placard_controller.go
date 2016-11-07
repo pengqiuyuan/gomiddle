@@ -87,7 +87,7 @@ func GetAllPlacards(w http.ResponseWriter, r *http.Request) {
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDKdsGetAllPlacards)]
 				bw := []byte(res)
 				w.Write(bw)
-			case <-time.After(time.Second * 1):
+			case <-time.After(time.Second * 30):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  getAllPlacards  " , proto.TcpProtoIDKdsGetAllPlacards)
 				res = `[]`
 				bw := []byte(res)
@@ -127,7 +127,7 @@ func TcpProtoIDKdsPlacardGetTotalByServerZoneIdAndGameId(w http.ResponseWriter, 
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDKdsPlacardGetTotalByServerZoneIdAndGameId)]
 				bw := []byte(res)
 			    w.Write(bw)
-			case <-time.After(time.Second * 1):
+			case <-time.After(time.Second * 30):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  TcpProtoIDKdsPlacardGetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDKdsPlacardGetTotalByServerZoneIdAndGameId)
 				res = `{"num":0}`
 				bw := []byte(res)
@@ -161,7 +161,7 @@ func GetPlacardById(w http.ResponseWriter, r *http.Request){
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDKdsGetPlacardById)]
 				bw := []byte(res)
 				w.Write(bw)
-			case <-time.After(time.Second * 1):
+			case <-time.After(time.Second * 30):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  GetPlacardById ",proto.TcpProtoIDKdsGetPlacardById)
 				res = `{}`
 				bw := []byte(res)
@@ -210,7 +210,7 @@ func DelPlacardById(w http.ResponseWriter, r *http.Request) {
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDKdsDelPlacardById)]
 				bw := []byte(res)
 				w.Write(bw)
-			case <-time.After(time.Second * 1):
+			case <-time.After(time.Second * 30):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  delPlacardById  ",proto.TcpProtoIDKdsDelPlacardById)
 				res = `{"message":"error"}`
 				bw := []byte(res)
@@ -256,7 +256,7 @@ func AddOrUpdatePlacard(m uint16, w http.ResponseWriter, r *http.Request) {
 						res = `{"choose":"` + responseList.Choose + `","success":"` + responseList.Success + `","objFail":"` + objF + `","fail":"` + responseList.Fail + `"}`
 					}
 					
-				case <-time.After(time.Second * 1):
+				case <-time.After(time.Second * 30):
 					fmt.Println(key, "  存在,超时客户端无返回值  AddOrUpdate ",m)					
 					res = `{"choose":"1","success":"0","objFail":"` + key + `","fail":"1"}`
 					

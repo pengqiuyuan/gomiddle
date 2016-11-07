@@ -68,7 +68,7 @@ func AddOrUpdateServer(m uint16, w http.ResponseWriter, r *http.Request) {
 						res = `{"choose":"` + responseList.Choose + `","success":"` + responseList.Success + `","objFail":"` + objF + `","fail":"` + responseList.Fail + `","status":"` + responseList.Status+ `"}`
 					}
 					
-				case <-time.After(time.Second * 1):
+				case <-time.After(time.Second * 30):
 					fmt.Println(key, "  存在,超时客户端无返回值  AddOrUpdate ",m)	
 					//web server 修改服务器状态，游戏服务器存在但没有响应，返回-1				
 					res = `{"choose":"1","success":"0","objFail":"` + key + `","fail":"1","status":"-1"}`

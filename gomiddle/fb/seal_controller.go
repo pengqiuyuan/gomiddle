@@ -50,7 +50,7 @@ func GetAllSealAccount(w http.ResponseWriter, r *http.Request) {
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbGetAllSealAccount)]
 				bw := []byte(res)
 				w.Write(bw)
-			case <-time.After(time.Second * 1):
+			case <-time.After(time.Second * 30):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  getAllSealAccount ",proto.TcpProtoIDFbGetAllSealAccount)
 				res = `[]`
 				bw := []byte(res)
@@ -92,7 +92,7 @@ func DelSealAccount(w http.ResponseWriter, r *http.Request) {
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbDelSealAccount)]
 				bw := []byte(res)
 				w.Write(bw)
-			case <-time.After(time.Second * 1):
+			case <-time.After(time.Second * 30):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  delSealAccount ",proto.TcpProtoIDFbDelSealAccount)
 				res = `{"message":"error"}`
 				bw := []byte(res)
@@ -129,7 +129,7 @@ func AddOrUpdateSeal(m uint16, w http.ResponseWriter, r *http.Request) {
 				res = x[string(connid)+"_"+string(m)]
 				bw := []byte(res)
 				w.Write(bw)
-			case <-time.After(time.Second * 1):
+			case <-time.After(time.Second * 30):
 				fmt.Println(ser, "  存在,超时客户端无返回值  AddOrUpdate ",m)
 				res = `{"message":"error"}`
 				bw := []byte(res)
@@ -167,7 +167,7 @@ func TcpProtoIDFbSealGetTotalByServerZoneIdAndGameId(w http.ResponseWriter, r *h
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbSealGetTotalByServerZoneIdAndGameId)]
 				bw := []byte(res)
 			    w.Write(bw)
-			case <-time.After(time.Second * 1):
+			case <-time.After(time.Second * 30):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  TcpProtoIDFbSealGetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDFbSealGetTotalByServerZoneIdAndGameId)
 				res = `{"num":0}`
 				bw := []byte(res)

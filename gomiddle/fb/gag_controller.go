@@ -53,7 +53,7 @@ func GetAllGagAccount(w http.ResponseWriter, r *http.Request){
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbGetAllGagAccount)]
 				bw := []byte(res)
 				w.Write(bw)
-			case <-time.After(time.Second * 1):
+			case <-time.After(time.Second * 30):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  getAllGagAccount ",proto.TcpProtoIDFbGetAllGagAccount)
 				res = `[]`
 				bw := []byte(res)
@@ -95,7 +95,7 @@ func DelGagAccountById(w http.ResponseWriter, r *http.Request){
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbDelGagAccountById)]
 				bw := []byte(res)
 				w.Write(bw)
-			case <-time.After(time.Second * 1):
+			case <-time.After(time.Second * 30):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  delGagAccountById ",proto.TcpProtoIDFbDelGagAccountById)
 				res = `{"message":"error"}`
 				bw := []byte(res)
@@ -131,7 +131,7 @@ func AddOrUpdateGag(m uint16, w http.ResponseWriter, r *http.Request) {
 				res = x[string(connid)+"_"+string(m)]
 				bw := []byte(res)
 				w.Write(bw)
-			case <-time.After(time.Second * 1):
+			case <-time.After(time.Second * 30):
 				fmt.Println(ser, "  存在,超时客户端无返回值  AddOrUpdate ",m)
 				res = `{"message":"error"}`
 				bw := []byte(res)
@@ -169,7 +169,7 @@ func TcpProtoIDFbGagGetTotalByServerZoneIdAndGameId(w http.ResponseWriter, r *ht
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbGagGetTotalByServerZoneIdAndGameId)]
 				bw := []byte(res)
 			    w.Write(bw)
-			case <-time.After(time.Second * 1):
+			case <-time.After(time.Second * 30):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  TcpProtoIDFbGagGetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDFbGagGetTotalByServerZoneIdAndGameId)
 				res = `{"num":0}`
 				bw := []byte(res)

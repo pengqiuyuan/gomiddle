@@ -52,7 +52,7 @@ func GetAllGrayAccount(w http.ResponseWriter, r *http.Request) {
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDKdsGetAllGrayAccount)]
 				bw := []byte(res)
 				w.Write(bw)
-			case <-time.After(time.Second * 1):
+			case <-time.After(time.Second * 30):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  GetAllGrayAccount  " , proto.TcpProtoIDKdsGetAllGrayAccount)
 				res = `[]`
 				bw := []byte(res)
@@ -87,7 +87,7 @@ func DelGrayAccountById(w http.ResponseWriter, r *http.Request) {
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDKdsDelGrayAccountById)]
 				bw := []byte(res)
 				w.Write(bw)
-			case <-time.After(time.Second * 1):
+			case <-time.After(time.Second * 30):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  DelGrayAccountById  ",proto.TcpProtoIDKdsDelGrayAccountById)
 				res = `{"message":"error"}`
 				bw := []byte(res)
@@ -121,7 +121,7 @@ func GetGrayAccountByAccountId(w http.ResponseWriter, r *http.Request) {
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDKdsGetGrayAccountById)]
 				bw := []byte(res)
 				w.Write(bw)
-			case <-time.After(time.Second * 1):
+			case <-time.After(time.Second * 30):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  GetGrayAccountById ",proto.TcpProtoIDKdsGetGrayAccountById)
 				res = `{}`
 				bw := []byte(res)
@@ -176,7 +176,7 @@ func AddOrUpdateGrayAccount(m uint16, w http.ResponseWriter, r *http.Request) {
 						res = `{"choose":"` + responseList.Choose + `","success":"` + responseList.Success + `","objFail":"` + objF + `","fail":"` + responseList.Fail + `"}`
 					}
 					
-				case <-time.After(time.Second * 1):
+				case <-time.After(time.Second * 30):
 					fmt.Println(key, "  存在,超时客户端无返回值  AddOrUpdate ",m)					
 					res = `{"choose":"1","success":"0","objFail":"` + key + `","fail":"1"}`
 					
@@ -213,7 +213,7 @@ func TcpProtoIDKdsGrayGetTotalByServerZoneIdAndGameId(w http.ResponseWriter, r *
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDKdsGrayGetTotalByServerZoneIdAndGameId)]
 				bw := []byte(res)
 			    w.Write(bw)
-			case <-time.After(time.Second * 1):
+			case <-time.After(time.Second * 30):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  TcpProtoIDKdsGrayGetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDKdsGrayGetTotalByServerZoneIdAndGameId)
 				res = `{"num":0}`
 				bw := []byte(res)
