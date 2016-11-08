@@ -74,7 +74,7 @@ func GetAllProducts(w http.ResponseWriter, r *http.Request){
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbGetAllProducts)]
 				bw := []byte(res)
 				w.Write(bw)
-			case <-time.After(time.Second * 30):
+			case <-time.After(time.Second * 4):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  getAllProducts ",proto.TcpProtoIDFbGetAllProducts)
 				res = `[]`
 				bw := []byte(res)
@@ -116,7 +116,7 @@ func DelProductById(w http.ResponseWriter, r *http.Request){
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbDelProductById)]
 				bw := []byte(res)
 				w.Write(bw)
-			case <-time.After(time.Second * 30):
+			case <-time.After(time.Second * 4):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  delProductById ",proto.TcpProtoIDFbDelProductById)
 				res = `{"message":"error"}`
 				bw := []byte(res)
@@ -167,7 +167,7 @@ func AddOrUpdateProduct(m uint16, w http.ResponseWriter, r *http.Request) {
 						res = `{"choose":"` + responseList.Choose + `","success":"` + responseList.Success + `","objFail":"` + objF + `","fail":"` + responseList.Fail + `"}`
 					}
 					
-				case <-time.After(time.Second * 30):
+				case <-time.After(time.Second * 4):
 					fmt.Println(key, "  存在,超时客户端无返回值  AddOrUpdate ",m)					
 					res = `{"choose":"1","success":"0","objFail":"` + key + `","fail":"1"}`
 					
@@ -204,7 +204,7 @@ func TcpProtoIDFbProductGetTotalByServerZoneIdAndGameId(w http.ResponseWriter, r
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDFbProductGetTotalByServerZoneIdAndGameId)]
 				bw := []byte(res)
 			    w.Write(bw)
-			case <-time.After(time.Second * 30):
+			case <-time.After(time.Second * 4):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  TcpProtoIDFbProductGetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDFbProductGetTotalByServerZoneIdAndGameId)
 				res = `{"num":0}`
 				bw := []byte(res)

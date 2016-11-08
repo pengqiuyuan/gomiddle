@@ -59,7 +59,7 @@ func GetAllEmails(w http.ResponseWriter, r *http.Request){
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDXyjGetAllEmails)]
 				bw := []byte(res)
 				w.Write(bw)
-			case <-time.After(time.Second * 30):
+			case <-time.After(time.Second * 4):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  getAllEmails ",proto.TcpProtoIDXyjGetAllEmails)
 				res = `[]`
 				bw := []byte(res)
@@ -101,7 +101,7 @@ func GetEmailById(w http.ResponseWriter, r *http.Request){
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDXyjGetEmailById)]
 				bw := []byte(res)
 				w.Write(bw)
-			case <-time.After(time.Second * 30):
+			case <-time.After(time.Second * 4):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  getEmailById ",proto.TcpProtoIDXyjGetEmailById)
 				res = ``
 				bw := []byte(res)
@@ -135,7 +135,7 @@ func DelEmailById(w http.ResponseWriter, r *http.Request){
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDXyjDelEmailById)]
 				bw := []byte(res)
 				w.Write(bw)
-			case <-time.After(time.Second * 30):
+			case <-time.After(time.Second * 4):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  delEmailById ",proto.TcpProtoIDXyjDelEmailById)
 				res = `{"message":"error"}`
 				bw := []byte(res)
@@ -182,7 +182,7 @@ func AddOrUpdateEmail(m uint16, w http.ResponseWriter, r *http.Request) {
 						res = `{"choose":"` + responseList.Choose + `","success":"` + responseList.Success + `","objFail":"` + objF + `","fail":"` + responseList.Fail + `"}`
 					}
 					
-				case <-time.After(time.Second * 30):
+				case <-time.After(time.Second * 4):
 					fmt.Println(key, "  存在,超时客户端无返回值  AddOrUpdate ",m)					
 					res = `{"choose":"1","success":"0","objFail":"` + key + `","fail":"1"}`
 					
@@ -219,7 +219,7 @@ func TcpProtoIDXyjEmailGetTotalByServerZoneIdAndGameId(w http.ResponseWriter, r 
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDXyjEmailGetTotalByServerZoneIdAndGameId)]
 				bw := []byte(res)
 			    w.Write(bw)
-			case <-time.After(time.Second * 30):
+			case <-time.After(time.Second * 4):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  TcpProtoIDXyjEmailGetTotalByServerZoneIdAndGameId  ",proto.TcpProtoIDXyjEmailGetTotalByServerZoneIdAndGameId)
 				res = `{"num":0}`
 				bw := []byte(res)

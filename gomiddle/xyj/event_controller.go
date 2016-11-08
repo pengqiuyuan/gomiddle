@@ -135,7 +135,7 @@ func AddOrUpdateEventPrototype(m uint16, w http.ResponseWriter, r *http.Request)
 						res = `{"choose":"1","success":"0","objFail":"` + key + `","fail":"1"}`
 					}
 					
-				case <-time.After(time.Second * 30):
+				case <-time.After(time.Second * 4):
 					fmt.Println(key, "  存在,超时客户端无返回值  AddOrUpdate 新增、修改活动",m)					
 					res = `{"choose":"1","success":"0","objFail":"` + key + `","fail":"1"}`
 					
@@ -191,7 +191,7 @@ func AddOrUpdateEventDataPrototype(m uint16, w http.ResponseWriter, r *http.Requ
 						res = `{"choose":"1","success":"0","objFail":"` + key + `","fail":"1"}`
 					}
 					
-				case <-time.After(time.Second * 30):
+				case <-time.After(time.Second * 4):
 					fmt.Println(key, "  存在,超时客户端无返回值  AddOrUpdate 新增、修改活动下得条目",m)					
 					res = `{"choose":"1","success":"0","objFail":"` + key + `","fail":"1"}`
 					
@@ -216,7 +216,7 @@ func CloseEventPrototype(w http.ResponseWriter, r *http.Request){
 		id := r.FormValue("id")
 		JsonStr := `{"serverZoneId":"` + serverZoneId + `","gameId":"` + gameId + `","serverId":"` + serverId + `","id":"` + id + `"}`
 		conn, exists := gomiddle.ConnMap[serverId]
-		var res string
+		var res string	
 		if exists {
 			fmt.Println(r.FormValue("serverId"), "  存在   ", conn)
 			connid, _ := gomiddle.ConnMa[serverId]
@@ -228,7 +228,7 @@ func CloseEventPrototype(w http.ResponseWriter, r *http.Request){
 				res = x[string(connid)+"_"+string(proto.TcpProtoIDXyjCloseEventPrototype)]
 				bw := []byte(res)
 				w.Write(bw)
-			case <-time.After(time.Second * 30):
+			case <-time.After(time.Second * 4):
 				fmt.Println(serverId, "  存在,超时客户端无返回值  CloseEventPrototype 关闭活动",proto.TcpProtoIDXyjCloseEventPrototype)
 				res = `{"message":"error"}`
 				bw := []byte(res)
