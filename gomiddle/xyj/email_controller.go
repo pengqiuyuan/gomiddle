@@ -27,6 +27,7 @@ type EmailEntity struct{
 	Title string  
 	Contents string   
 	Annex []Ann
+	Receiver []string
 }
 
 func EmailHandler() {
